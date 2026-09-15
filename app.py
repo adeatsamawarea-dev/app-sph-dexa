@@ -11,7 +11,10 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Auto Brosur & Modern)")
+st.subheader("Format Portrait (Smart Link & Brosur)")
+
+# --- LINK GOOGLE SHEETS BAPAK ---
+LINK_KATALOG = "https://docs.google.com/spreadsheets/d/1TbTxpGflRUsfPMLq5Co_dNrXqiBUI4c-/edit?gid=1093140217#gid=1093140217"
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -62,6 +65,8 @@ if 'keranjang' not in st.session_state:
     st.session_state.keranjang = []
 
 # --- ANTARMUKA APLIKASI ---
+st.info(f"🔗 **[Klik di sini untuk membuka Master Data Katalog (Google Sheets)]({LINK_KATALOG})**")
+
 st.markdown("### 1. Pilih Outlet / Rumah Sakit")
 selected_outlet = st.selectbox("Outlet:", outlets, label_visibility="collapsed")
 
@@ -82,10 +87,13 @@ if st.button("➕ Tambah ke SPH", use_container_width=True):
     isi_val = safe_float(prod_data.get('Isi', 1))
     if isi_val <= 0: isi_val = 1
         
-    # Perhitungan: (HNA - Diskon) * 1.11 (PPN) / Isi
     harga_net = hna_val - (hna_val * diskon / 100)
     harga_total_ppn = harga_net * 1.11 
     harga_jadi_satuan = harga_total_ppn / isi_val
+    
+    # Menarik data Link Web dari CSV (jika ada)
+    link_web_val = prod_data.get('Link Web', '')
+    if pd.isna(link_web_val): link_web_val = ''
     
     st.session_state.keranjang.append({
         'Nama Produk': selected_produk,
@@ -95,7 +103,8 @@ if st.button("➕ Tambah ke SPH", use_container_width=True):
         'Isi': int(isi_val),
         'HNA': hna_val,
         'Diskon': diskon,
-        'Harga Jadi Satuan': harga_jadi_satuan
+        'Harga Jadi Satuan': harga_jadi_satuan,
+        'Link Web': str(link_web_val).strip()
     })
     st.success(f"Berhasil menambahkan {selected_produk}!")
 
@@ -173,7 +182,6 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, 'Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :', 0, 1, 'L')
         pdf.ln(3)
         
-        # === TABEL HEADER (Modern Grey Theme #E0E0E0) ===
         pdf.set_font('Arial', 'B', 8)
         pdf.set_fill_color(224, 224, 224)
         pdf.set_text_color(40, 40, 40)
@@ -186,7 +194,6 @@ if len(st.session_state.keranjang) > 0:
             pdf.cell(col_widths[i], 8, headers[i], 1, 0, 'C', 1)
         pdf.ln()
         
-        # Tabel Isi
         pdf.set_font('Arial', '', 8)
         pdf.set_text_color(0, 0, 0)
         for item in st.session_state.keranjang:
@@ -234,7 +241,6 @@ if len(st.session_state.keranjang) > 0:
         
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
-        # Tanda Tangan Digital (QR CODE)
         y_ttd = pdf.get_y()
         if os.path.exists(qr_path):
             pdf.image(qr_path, 7, y_ttd + 2, 22)
@@ -245,12 +251,21 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', '', 9)
         pdf.cell(0, 5, 'Regional Lead (PIMDA)', 0, 1, 'L')
         
-        # === HALAMAN 2: LAMPIRAN (AUTO BROSUR / KOTAK) ===
+        # === HALAMAN 2: LAMPIRAN (SMART LINK & BROSUR) ===
         pdf.add_page()
         pdf.set_font('Arial', 'B', 11)
         pdf.set_text_color(0, 86, 179)
-        pdf.cell(0, 8, 'LAMPIRAN: INDIKASI DAN BROSUR PRODUK', 0, 1, 'C')
-        pdf.ln(3)
+        pdf.cell(0, 8, 'LAMPIRAN: INDIKASI DAN DETAIL PRODUK', 0, 1, 'C')
+        pdf.ln(1)
+        
+        pdf.set_font('Arial', '', 9)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 5, 'Untuk melihat katalog keseluruhan produk, silakan akses tautan berikut:', 0, 1, 'C')
+        
+        pdf.set_font('Arial', 'U', 9)
+        pdf.set_text_color(0, 0, 255)
+        pdf.cell(0, 5, 'Buka Master Katalog Dexa Medica (Klik di sini)', 0, 1, 'C', link=LINK_KATALOG)
+        pdf.ln(7)
         
         for idx, item in enumerate(st.session_state.keranjang, start=1):
             pdf.set_font('Arial', 'B', 10)
@@ -265,10 +280,20 @@ if len(st.session_state.keranjang) > 0:
             pdf.multi_cell(0, 5, indikasi_bersih)
             pdf.ln(2)
             
-            pdf.set_font('Arial', 'B', 9)
-            pdf.cell(0, 5, "Brosur Produk:", 0, 1, 'L')
+            # --- FITUR SMART LINK (LINK WEB) ---
+            url_produk = item.get('Link Web', '')
+            if url_produk and url_produk != '-' and url_produk.startswith('http'):
+                pdf.set_font('Arial', 'B', 9)
+                pdf.cell(0, 5, "Informasi Lengkap (Website):", 0, 1, 'L')
+                
+                pdf.set_font('Arial', 'U', 9)
+                pdf.set_text_color(0, 0, 255) # Warna Biru Link
+                pdf.cell(0, 5, 'Klik di sini untuk melihat brosur & detail di Web Resmi Dexa', 0, 1, 'L', link=url_produk)
+                
+                pdf.set_text_color(0, 0, 0) # Kembalikan ke warna hitam
+                pdf.ln(3)
             
-            # Deteksi apakah ada file brosur khusus (misal: brosur_NAMA_PRODUK.png)
+            # --- FITUR KOTAK BROSUR (Tetap dipertahankan sbg opsi) ---
             clean_prod_name = re.sub(r'[^\w]', '_', item['Nama Produk'])
             brosur_file = f"brosur_{clean_prod_name}.png"
             brosur_file_jpg = f"brosur_{clean_prod_name}.jpg"
@@ -278,26 +303,26 @@ if len(st.session_state.keranjang) > 0:
             elif os.path.exists(brosur_file_jpg): found_brosur = brosur_file_jpg
             
             if found_brosur:
-                # Jika file brosur ditemukan, tampilkan gambar aslinya di PDF
                 try:
-                    pdf.image(found_brosur, w=196) # Lebar penuh margin halaman
+                    pdf.image(found_brosur, w=196)
                     pdf.ln(3)
-                except:
-                    pass
+                except: pass
             else:
-                # Jika belum ada file brosur, tampilkan kotak panduan kosong
-                x_brosur = pdf.get_x()
-                y_brosur = pdf.get_y()
-                pdf.set_draw_color(200, 200, 200)
-                pdf.rect(x_brosur, y_brosur, 196, 28) 
-                pdf.set_font('Arial', 'I', 8)
-                pdf.set_text_color(150, 150, 150)
-                pdf.set_xy(x_brosur, y_brosur + 10)
-                pdf.cell(196, 5, f"( Upload file '{brosur_file}' ke GitHub untuk menampilkan brosur asli )", 0, 1, 'C')
-                
-            pdf.set_text_color(0, 0, 0)
-            pdf.set_draw_color(180, 180, 180)
-            pdf.ln(3)
+                # Menampilkan ruang opsional jika tidak ada link web dan tidak ada gambar
+                if not (url_produk and url_produk != '-' and url_produk.startswith('http')):
+                    x_brosur = pdf.get_x()
+                    y_brosur = pdf.get_y()
+                    pdf.set_draw_color(200, 200, 200)
+                    pdf.rect(x_brosur, y_brosur, 196, 20) 
+                    pdf.set_font('Arial', 'I', 8)
+                    pdf.set_text_color(150, 150, 150)
+                    pdf.set_xy(x_brosur, y_brosur + 6)
+                    pdf.cell(196, 5, f"( Detail Brosur tidak tersedia. Tambahkan Link Web pada Master Data )", 0, 1, 'C')
+                    pdf.set_text_color(0, 0, 0)
+                    pdf.set_draw_color(180, 180, 180)
+                    pdf.set_y(y_brosur + 23)
+            
+            pdf.ln(2)
             
             if pdf.get_y() > 250:
                 pdf.add_page()
