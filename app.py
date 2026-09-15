@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Revisi Spasi & Tabel Elegan)")
+st.subheader("Format Portrait (Revisi Download Fix)")
 
 # --- LINK GOOGLE SHEETS BAPAK ---
 LINK_KATALOG = "https://docs.google.com/spreadsheets/d/1TbTxpGflRUsfPMLq5Co_dNrXqiBUI4c-/edit?gid=1093140217#gid=1093140217"
@@ -128,8 +128,11 @@ if len(st.session_state.keranjang) > 0:
         logo_path = "logoDX.webp"
         logo_png = "logo_temp.png"
         if os.path.exists(logo_path):
-            img = Image.open(logo_path)
-            img.save(logo_png, "PNG")
+            try:
+                img = Image.open(logo_path)
+                img.save(logo_png, "PNG")
+            except:
+                pass
             
         qr_path = "ttd_qr.png"
         qr = qrcode.QRCode(version=1, box_size=10, border=2)
@@ -169,7 +172,6 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', 'B', 11)
         pdf.cell(0, 5, 'Perihal : Surat Penawaran Harga', 0, 1, 'L')
         
-        # Jarak diperlebar antara Perihal dan Kepada
         pdf.ln(8) 
         
         pdf.set_font('Arial', '', 10)
@@ -177,29 +179,26 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, 'Kepala Farmasi', 0, 1, 'L')
         pdf.cell(0, 5, sanitize_text(cust_data.get('Nama Outlet', '-')), 0, 1, 'L')
         
-        # Jarak diperlebar antara Nama RS dan Dengan hormat
         pdf.ln(8) 
         
         pdf.cell(0, 5, 'Dengan hormat,', 0, 1, 'L')
         pdf.cell(0, 5, 'Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :', 0, 1, 'L')
         pdf.ln(4)
         
-        # === TABEL HEADER (Elegan) ===
+        # === TABEL HEADER ===
         pdf.set_font('Arial', 'B', 8)
-        pdf.set_fill_color(235, 235, 235) # Warna abu-abu halus untuk header
+        pdf.set_fill_color(235, 235, 235) 
         pdf.set_text_color(30, 30, 30)
-        pdf.set_draw_color(160, 160, 160) # Garis tabel abu-abu, tidak hitam pekat
+        pdf.set_draw_color(160, 160, 160) 
         
-        # Penyesuaian Lebar Kolom (Total 196mm)
         col_widths = [45, 42, 17, 9, 24, 11, 48] 
         headers = ['Nama Produk', 'Indikasi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi (Satuan Terkecil)']
         
-        # Header ditambahkan padding atas-bawah dengan tinggi 8
         for i in range(len(headers)):
             pdf.cell(col_widths[i], 8, headers[i], 1, 0, 'C', 1)
         pdf.ln()
         
-        # Tabel Isi (Dengan Padding Elegan)
+        # === TABEL ISI ===
         pdf.set_font('Arial', '', 8)
         pdf.set_text_color(0, 0, 0)
         
@@ -214,7 +213,6 @@ if len(st.session_state.keranjang) > 0:
                 f"{item['Harga Jadi Satuan']:,.0f}"
             ]
             
-            # Hitung baris teks tertinggi
             max_h = 5
             for i, text in enumerate(row):
                 lines = 0
@@ -224,13 +222,11 @@ if len(st.session_state.keranjang) > 0:
                 h = lines * 4.5
                 if h > max_h: max_h = h
                 
-            # Tambahkan ruang ekstra/padding atas-bawah agar elegan dan tidak sumpek
             max_h = max_h + 3 
             
             start_x = pdf.get_x()
             start_y = pdf.get_y()
             
-            # Buat halaman baru jika melebihi batas bawah kertas
             if start_y + max_h > 245: 
                 pdf.add_page()
                 start_y = pdf.get_y()
@@ -238,12 +234,10 @@ if len(st.session_state.keranjang) > 0:
             for i in range(len(row)):
                 x = pdf.get_x()
                 y = pdf.get_y()
-                # Gambar kotak (Border)
                 pdf.rect(x, y, col_widths[i], max_h)
                 
                 align = 'R' if i in [4, 5, 6] else 'C' if i in [2, 3] else 'L'
                 
-                # Mengatur posisi teks sedikit turun (padding atas) agar berada di tengah kotak
                 pdf.set_xy(x, y + 1.5)
                 pdf.multi_cell(col_widths[i], 4.5, str(row[i]), 0, align)
                 pdf.set_xy(x + col_widths[i], start_y)
@@ -254,12 +248,10 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', '', 9.5)
         pdf.multi_cell(0, 5, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan ini, atas perhatian dan kerjasamanya kami ucapkan terimakasih.')
         
-        # Jarak diperlebar antara paragraf penutup dan Salam
         pdf.ln(8) 
         
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
-        # Tanda Tangan Digital (QR CODE)
         y_ttd = pdf.get_y()
         if os.path.exists(qr_path):
             pdf.image(qr_path, 7, y_ttd + 2, 22)
@@ -268,7 +260,6 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', 'B', 10)
         pdf.cell(0, 5, 'Ade Budi Susetyo', 0, 1, 'L')
         pdf.set_font('Arial', '', 9)
-        # Perubahan jabatan menjadi AM
         pdf.cell(0, 5, 'AM', 0, 1, 'L') 
         
         # === HALAMAN 2: LAMPIRAN (SMART LINK & BROSUR) ===
@@ -344,7 +335,11 @@ if len(st.session_state.keranjang) > 0:
             if pdf.get_y() > 250:
                 pdf.add_page()
         
-        pdf_bytes = pdf.output(dest='S').encode('latin-1')
+        # --- FIX UNTUK ERROR DOWNLOAD (KESALAHAN SERVER) ---
+        try:
+            pdf_bytes = bytes(pdf.output()) # Format fpdf2 baru
+        except:
+            pdf_bytes = pdf.output(dest='S').encode('latin-1') # Format fpdf lama
         
         if os.path.exists(logo_png): os.remove(logo_png)
         if os.path.exists(qr_path): os.remove(qr_path)
