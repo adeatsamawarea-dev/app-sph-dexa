@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Smart Calculator & Rapi)")
+st.subheader("Format Portrait (Kalkulator Diskon & Kolom Kemasan)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -77,13 +77,13 @@ elif 'Harga Hna' in prod_data.index: hna_val = safe_float(prod_data['Harga Hna']
 isi_val = safe_float(prod_data.get('Isi', 1))
 if isi_val <= 0: isi_val = 1
 
-# Prioritaskan baca kolom 'Satuan', jika tidak ada baru baca 'Kemasan'
-satuan_val = prod_data.get('Satuan', prod_data.get('Kemasan', '-'))
+# Prioritaskan membaca kolom 'Kemasan', jika tidak ada baca 'Satuan'
+kemasan_val = prod_data.get('Kemasan', prod_data.get('Satuan', '-'))
 link_web_val = prod_data.get('Link Web', '')
 if pd.isna(link_web_val): link_web_val = ''
 
 # Menampilkan informasi dasar (HNA)
-st.info(f"ℹ️ **Info Dasar Produk:** HNA: **Rp {hna_val:,.0f}** | Isi: **{int(isi_val)}** | Satuan: **{sanitize_text(satuan_val)}**")
+st.info(f"ℹ️ **Info Dasar Produk:** HNA: **Rp {hna_val:,.0f}** | Isi: **{int(isi_val)}** | Kemasan: **{sanitize_text(kemasan_val)}**")
 
 # --- FITUR SMART CALCULATOR ---
 st.markdown("#### Mode Perhitungan Harga:")
@@ -132,7 +132,7 @@ if st.button("➕ Tambah ke SPH", use_container_width=True):
     st.session_state.keranjang.append({
         'Nama Produk': selected_produk,
         'Indikasi': prod_data.get('Indikasi', '-'),
-        'Satuan': satuan_val,
+        'Kemasan': kemasan_val,
         'Isi': int(isi_val),
         'HNA': hna_val,
         'Diskon': diskon_final,
@@ -218,16 +218,15 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, 'Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :', 0, 1, 'L')
         pdf.ln(4)
         
-        # === TABEL HEADER (WRAP TEXT & PROPORSI BARU) ===
+        # === TABEL HEADER (WRAP TEXT & KEMASAN SEBELUM ISI) ===
         pdf.set_font('Arial', 'B', 9)
         pdf.set_fill_color(235, 235, 235) 
         pdf.set_text_color(30, 30, 30)
         pdf.set_draw_color(160, 160, 160) 
         
-        # Lebar Kertas(210) - Margin Kiri(30) - Kanan(25) = Lebar Tabel(155)
-        # Penyesuaian agar teks Satuan tidak turun ke bawah
-        col_widths = [56, 20, 10, 23, 14, 32] 
-        headers = ['Nama Produk', 'Satuan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi\n(Sat/Terkecil)']
+        # Lebar Total 155mm (Nama Produk, Kemasan, Isi, HNA, Disc, Harga Jadi)
+        col_widths = [50, 26, 10, 23, 14, 32] 
+        headers = ['Nama Produk', 'Kemasan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi\n(Sat/Terkecil)']
         
         start_x = pdf.get_x()
         start_y = pdf.get_y()
@@ -238,7 +237,6 @@ if len(st.session_state.keranjang) > 0:
             y = pdf.get_y()
             pdf.rect(x, y, col_widths[i], max_h_header, style='DF')
             
-            # Deteksi Baris Baru (Wrap Text)
             if '\n' in headers[i]:
                 pdf.set_xy(x, y + 1.5)
                 pdf.multi_cell(col_widths[i], 3.5, headers[i], 0, 'C')
@@ -255,13 +253,12 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_text_color(0, 0, 0)
         
         for item in st.session_state.keranjang:
-            # Gunakan 'Satuan' sesuai permintaan Bapak
             row = [
                 sanitize_text(item['Nama Produk']),
-                sanitize_text(item['Satuan']),
+                sanitize_text(item['Kemasan']),
                 str(item['Isi']),
                 f"{item['HNA']:,.0f}",
-                f"{item['Diskon']:g}%", # :g akan menghilangkan .00 jika pas bulat
+                f"{item['Diskon']:g}%",
                 f"{item['Harga Jadi Satuan']:,.0f}"
             ]
             
