@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Revisi Download Fix)")
+st.subheader("Format Portrait (Preview Harga & Tabel Bersih)")
 
 # --- LINK GOOGLE SHEETS BAPAK ---
 LINK_KATALOG = "https://docs.google.com/spreadsheets/d/1TbTxpGflRUsfPMLq5Co_dNrXqiBUI4c-/edit?gid=1093140217#gid=1093140217"
@@ -77,23 +77,28 @@ with col1:
 with col2:
     diskon = st.number_input("Diskon (%)", min_value=0, max_value=100, value=0, step=1)
 
+# --- PERHITUNGAN LIVE UNTUK PREVIEW HARGA ---
+prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
+
+hna_val = 0.0
+if 'HNA' in prod_data.index: hna_val = safe_float(prod_data['HNA'])
+elif 'Harga Hna' in prod_data.index: hna_val = safe_float(prod_data['Harga Hna'])
+    
+isi_val = safe_float(prod_data.get('Isi', 1))
+if isi_val <= 0: isi_val = 1
+    
+harga_net = hna_val - (hna_val * diskon / 100)
+harga_total_ppn = harga_net * 1.11 
+harga_jadi_satuan = harga_total_ppn / isi_val
+
+link_web_val = prod_data.get('Link Web', '')
+if pd.isna(link_web_val): link_web_val = ''
+
+# Menampilkan Kotak Preview Harga Jadi
+st.success(f"💡 **Preview Harga Jadi (Satuan Terkecil): Rp {harga_jadi_satuan:,.0f}**")
+
+# --- TOMBOL TAMBAH ---
 if st.button("➕ Tambah ke SPH", use_container_width=True):
-    prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
-    
-    hna_val = 0.0
-    if 'HNA' in prod_data.index: hna_val = safe_float(prod_data['HNA'])
-    elif 'Harga Hna' in prod_data.index: hna_val = safe_float(prod_data['Harga Hna'])
-        
-    isi_val = safe_float(prod_data.get('Isi', 1))
-    if isi_val <= 0: isi_val = 1
-        
-    harga_net = hna_val - (hna_val * diskon / 100)
-    harga_total_ppn = harga_net * 1.11 
-    harga_jadi_satuan = harga_total_ppn / isi_val
-    
-    link_web_val = prod_data.get('Link Web', '')
-    if pd.isna(link_web_val): link_web_val = ''
-    
     st.session_state.keranjang.append({
         'Nama Produk': selected_produk,
         'Indikasi': prod_data.get('Indikasi', '-'),
@@ -104,7 +109,7 @@ if st.button("➕ Tambah ke SPH", use_container_width=True):
         'Harga Jadi Satuan': harga_jadi_satuan,
         'Link Web': str(link_web_val).strip()
     })
-    st.success(f"Berhasil menambahkan {selected_produk}!")
+    st.toast(f"Berhasil menambahkan {selected_produk} ke SPH!", icon="✅")
 
 if len(st.session_state.keranjang) > 0:
     st.markdown("### 📋 Daftar Produk di SPH:")
@@ -185,27 +190,27 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, 'Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :', 0, 1, 'L')
         pdf.ln(4)
         
-        # === TABEL HEADER ===
+        # === TABEL HEADER (Tanpa Indikasi) ===
         pdf.set_font('Arial', 'B', 8)
         pdf.set_fill_color(235, 235, 235) 
         pdf.set_text_color(30, 30, 30)
         pdf.set_draw_color(160, 160, 160) 
         
-        col_widths = [45, 42, 17, 9, 24, 11, 48] 
-        headers = ['Nama Produk', 'Indikasi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi (Satuan Terkecil)']
+        # Lebar disesuaikan setelah Indikasi dihilangkan (Total tetap 196mm)
+        col_widths = [72, 23, 11, 28, 14, 48] 
+        headers = ['Nama Produk', 'Kemasan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi (Satuan Terkecil)']
         
         for i in range(len(headers)):
             pdf.cell(col_widths[i], 8, headers[i], 1, 0, 'C', 1)
         pdf.ln()
         
-        # === TABEL ISI ===
+        # === TABEL ISI (Tanpa Indikasi) ===
         pdf.set_font('Arial', '', 8)
         pdf.set_text_color(0, 0, 0)
         
         for item in st.session_state.keranjang:
             row = [
                 sanitize_text(item['Nama Produk']),
-                sanitize_text(item['Indikasi']),
                 sanitize_text(item['Kemasan']),
                 str(item['Isi']),
                 f"{item['HNA']:,.0f}",
@@ -236,7 +241,8 @@ if len(st.session_state.keranjang) > 0:
                 y = pdf.get_y()
                 pdf.rect(x, y, col_widths[i], max_h)
                 
-                align = 'R' if i in [4, 5, 6] else 'C' if i in [2, 3] else 'L'
+                # Align: Kanan untuk HNA, Disc, Harga Jadi. Tengah untuk Kemasan & Isi. Kiri untuk Nama.
+                align = 'R' if i in [3, 4, 5] else 'C' if i in [1, 2] else 'L'
                 
                 pdf.set_xy(x, y + 1.5)
                 pdf.multi_cell(col_widths[i], 4.5, str(row[i]), 0, align)
@@ -262,7 +268,7 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', '', 9)
         pdf.cell(0, 5, 'AM', 0, 1, 'L') 
         
-        # === HALAMAN 2: LAMPIRAN (SMART LINK & BROSUR) ===
+        # === HALAMAN 2: LAMPIRAN (TETAP ADA INDIKASI) ===
         pdf.add_page()
         pdf.set_font('Arial', 'B', 11)
         pdf.set_text_color(0, 86, 179)
@@ -283,6 +289,7 @@ if len(st.session_state.keranjang) > 0:
             pdf.set_text_color(0, 86, 179)
             pdf.cell(0, 6, f"{idx}. {sanitize_text(item['Nama Produk'])}", 0, 1, 'L')
             
+            # Indikasi tetap dimunculkan di halaman 2
             pdf.set_text_color(0, 0, 0)
             pdf.set_font('Arial', 'B', 9)
             pdf.cell(0, 5, "Indikasi:", 0, 1, 'L')
@@ -335,11 +342,10 @@ if len(st.session_state.keranjang) > 0:
             if pdf.get_y() > 250:
                 pdf.add_page()
         
-        # --- FIX UNTUK ERROR DOWNLOAD (KESALAHAN SERVER) ---
         try:
-            pdf_bytes = bytes(pdf.output()) # Format fpdf2 baru
+            pdf_bytes = bytes(pdf.output()) 
         except:
-            pdf_bytes = pdf.output(dest='S').encode('latin-1') # Format fpdf lama
+            pdf_bytes = pdf.output(dest='S').encode('latin-1') 
         
         if os.path.exists(logo_png): os.remove(logo_png)
         if os.path.exists(qr_path): os.remove(qr_path)
