@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Margin Standar Resmi)")
+st.subheader("Format Portrait (Smart Calculator & Rapi)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -66,42 +66,77 @@ st.markdown("### 1. Pilih Outlet / Rumah Sakit")
 selected_outlet = st.selectbox("Outlet:", outlets, label_visibility="collapsed")
 
 st.markdown("### 2. Tambah Produk ke SPH")
-col1, col2 = st.columns([2, 1])
-with col1:
-    selected_produk = st.selectbox("Pilih Produk Obat:", produks)
-with col2:
-    diskon = st.number_input("Diskon (%)", min_value=0, max_value=100, value=0, step=1)
+selected_produk = st.selectbox("Pilih Produk Obat:", produks)
 
-# --- PERHITUNGAN LIVE UNTUK PREVIEW HARGA ---
+# Tarik data produk
 prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
-
 hna_val = 0.0
 if 'HNA' in prod_data.index: hna_val = safe_float(prod_data['HNA'])
 elif 'Harga Hna' in prod_data.index: hna_val = safe_float(prod_data['Harga Hna'])
     
 isi_val = safe_float(prod_data.get('Isi', 1))
 if isi_val <= 0: isi_val = 1
-    
-harga_net = hna_val - (hna_val * diskon / 100)
-harga_total_ppn = harga_net * 1.11 
-harga_jadi_satuan = harga_total_ppn / isi_val
 
+# Prioritaskan baca kolom 'Satuan', jika tidak ada baru baca 'Kemasan'
+satuan_val = prod_data.get('Satuan', prod_data.get('Kemasan', '-'))
 link_web_val = prod_data.get('Link Web', '')
 if pd.isna(link_web_val): link_web_val = ''
 
-# Menampilkan Kotak Preview Harga Jadi
-st.success(f"💡 **Preview Harga Jadi (Satuan Terkecil): Rp {harga_jadi_satuan:,.0f}**")
+# Menampilkan informasi dasar (HNA)
+st.info(f"ℹ️ **Info Dasar Produk:** HNA: **Rp {hna_val:,.0f}** | Isi: **{int(isi_val)}** | Satuan: **{sanitize_text(satuan_val)}**")
+
+# --- FITUR SMART CALCULATOR ---
+st.markdown("#### Mode Perhitungan Harga:")
+mode_hitung = st.radio(
+    "Pilih cara input:",
+    ["Input Diskon (%)", "Input Target Harga Jadi (Otomatis Hitung Diskon)"],
+    horizontal=True,
+    label_visibility="collapsed"
+)
+
+col1, col2 = st.columns([1, 1])
+
+if mode_hitung == "Input Diskon (%)":
+    with col1:
+        diskon_input = st.number_input("Masukkan Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
+    
+    # Hitung Harga Jadi
+    harga_jadi_kalkulasi = (hna_val - (hna_val * diskon_input / 100)) * 1.11 / isi_val
+    
+    with col2:
+        st.success(f"💡 **Harga Jadi:**\n### Rp {harga_jadi_kalkulasi:,.0f}")
+        
+    diskon_final = diskon_input
+    harga_jadi_final = harga_jadi_kalkulasi
+
+else:
+    harga_maksimal = (hna_val * 1.11) / isi_val
+    with col1:
+        harga_input = st.number_input("Masukkan Target Harga Jadi (Rp)", min_value=0.0, value=float(harga_maksimal), step=1000.0)
+    
+    # Hitung Balik Diskon
+    if hna_val > 0:
+        diskon_kalkulasi = (1 - ((harga_input * isi_val) / (hna_val * 1.11))) * 100
+    else:
+        diskon_kalkulasi = 0.0
+        
+    with col2:
+        st.success(f"💡 **Diskon Otomatis:**\n### {diskon_kalkulasi:,.2f}%")
+        
+    diskon_final = round(diskon_kalkulasi, 2)
+    harga_jadi_final = harga_input
+
 
 # --- TOMBOL TAMBAH ---
 if st.button("➕ Tambah ke SPH", use_container_width=True):
     st.session_state.keranjang.append({
         'Nama Produk': selected_produk,
         'Indikasi': prod_data.get('Indikasi', '-'),
-        'Kemasan': prod_data.get('Kemasan', '-'),
+        'Satuan': satuan_val,
         'Isi': int(isi_val),
         'HNA': hna_val,
-        'Diskon': diskon,
-        'Harga Jadi Satuan': harga_jadi_satuan,
+        'Diskon': diskon_final,
+        'Harga Jadi Satuan': harga_jadi_final,
         'Link Web': str(link_web_val).strip()
     })
     st.toast(f"Berhasil menambahkan {selected_produk} ke SPH!", icon="✅")
@@ -131,8 +166,7 @@ if len(st.session_state.keranjang) > 0:
             try:
                 img = Image.open(logo_path)
                 img.save(logo_png, "PNG")
-            except:
-                pass
+            except: pass
             
         qr_path = "ttd_qr.png"
         qr = qrcode.QRCode(version=1, box_size=10, border=2)
@@ -144,9 +178,8 @@ if len(st.session_state.keranjang) > 0:
         class PDF(FPDF):
             def header(self):
                 if os.path.exists(logo_png):
-                    # X diset 30 mengikuti margin kiri, Y diset 12
                     self.image(logo_png, 30, 12, 45)
-                    self.set_y(30) # Tulisan mulai pada margin atas 30mm
+                    self.set_y(30)
                 else:
                     self.set_y(30)
                     self.set_font('Arial', 'B', 15)
@@ -155,7 +188,6 @@ if len(st.session_state.keranjang) > 0:
                     self.ln(5)
                 
             def footer(self):
-                # Margin bawah 25mm (-25)
                 self.set_y(-25)
                 self.set_font('Arial', 'I', 8)
                 self.set_text_color(128)
@@ -163,7 +195,6 @@ if len(st.session_state.keranjang) > 0:
 
         # === HALAMAN 1: SURAT UTAMA ===
         pdf = PDF('P', 'mm', 'A4')
-        # Setting margin: Kiri=30mm, Atas=30mm, Kanan=25mm
         pdf.set_margins(30, 30, 25)
         pdf.add_page()
         
@@ -177,81 +208,77 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, 'Perihal : Surat Penawaran Harga', 0, 1, 'L')
         
         pdf.ln(8) 
-        
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 5, 'Kepada Yth,', 0, 1, 'L')
         pdf.cell(0, 5, 'Kepala Farmasi', 0, 1, 'L')
         pdf.cell(0, 5, sanitize_text(cust_data.get('Nama Outlet', '-')), 0, 1, 'L')
         
         pdf.ln(8) 
-        
         pdf.cell(0, 5, 'Dengan hormat,', 0, 1, 'L')
         pdf.cell(0, 5, 'Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :', 0, 1, 'L')
         pdf.ln(4)
         
-        # === TABEL HEADER (Font 10pt) ===
-        pdf.set_font('Arial', 'B', 10)
+        # === TABEL HEADER (WRAP TEXT & PROPORSI BARU) ===
+        pdf.set_font('Arial', 'B', 9)
         pdf.set_fill_color(235, 235, 235) 
         pdf.set_text_color(30, 30, 30)
         pdf.set_draw_color(160, 160, 160) 
         
-        # Lebar kertas (210) - Margin Kiri (30) - Margin Kanan (25) = Lebar Tabel (155mm)
-        col_widths = [48, 17, 8, 26, 11, 45] 
-        headers = ['Nama Produk', 'Kemasan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi (Satuan Terkecil)']
+        # Lebar Kertas(210) - Margin Kiri(30) - Kanan(25) = Lebar Tabel(155)
+        # Penyesuaian agar teks Satuan tidak turun ke bawah
+        col_widths = [56, 20, 10, 23, 14, 32] 
+        headers = ['Nama Produk', 'Satuan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi\n(Sat/Terkecil)']
         
-        # Gambar header secara manual menggunakan cell bertumpuk jika teks panjang
         start_x = pdf.get_x()
         start_y = pdf.get_y()
-        max_h_header = 10 # Tinggi header
+        max_h_header = 10 
         
         for i in range(len(headers)):
             x = pdf.get_x()
             y = pdf.get_y()
-            pdf.rect(x, y, col_widths[i], max_h_header, style='DF') # D=Draw, F=Fill
-            # Mengatur teks header ke tengah
-            pdf.set_xy(x, y + 2.5)
-            # Khusus untuk "Harga Jadi", ukurannya disesuaikan agar tidak meluap
-            if i == 5:
-                pdf.set_font('Arial', 'B', 9) 
+            pdf.rect(x, y, col_widths[i], max_h_header, style='DF')
+            
+            # Deteksi Baris Baru (Wrap Text)
+            if '\n' in headers[i]:
+                pdf.set_xy(x, y + 1.5)
+                pdf.multi_cell(col_widths[i], 3.5, headers[i], 0, 'C')
             else:
-                pdf.set_font('Arial', 'B', 10)
-            pdf.multi_cell(col_widths[i], 5, headers[i], 0, 'C')
+                pdf.set_xy(x, y + 3)
+                pdf.multi_cell(col_widths[i], 4, headers[i], 0, 'C')
+                
             pdf.set_xy(x + col_widths[i], start_y)
             
         pdf.ln(max_h_header)
         
-        # === TABEL ISI (Font 10pt, Line spacing padat) ===
+        # === TABEL ISI ===
         pdf.set_font('Arial', '', 10)
         pdf.set_text_color(0, 0, 0)
         
         for item in st.session_state.keranjang:
+            # Gunakan 'Satuan' sesuai permintaan Bapak
             row = [
                 sanitize_text(item['Nama Produk']),
-                sanitize_text(item['Kemasan']),
+                sanitize_text(item['Satuan']),
                 str(item['Isi']),
                 f"{item['HNA']:,.0f}",
-                f"{item['Diskon']}%",
+                f"{item['Diskon']:g}%", # :g akan menghilangkan .00 jika pas bulat
                 f"{item['Harga Jadi Satuan']:,.0f}"
             ]
             
-            # Hitung tinggi sel dinamis berdasarkan font 10pt
-            max_h = 6 # Tinggi minimum
+            max_h = 6
             for i, text in enumerate(row):
                 lines = 0
                 for paragraph in str(text).split('\n'):
                     w = pdf.get_string_width(paragraph)
-                    # Spasi antar tepi dihitung (col_widths[i] - 2)
                     lines += math.ceil(w / (col_widths[i] - 2)) if w > 0 else 1
-                # Menggunakan tinggi 5 untuk spasi baris standar yang terlihat padat (1.0 - 1.15)
                 h = lines * 5 
                 if h > max_h: max_h = h
                 
-            max_h = max_h + 4 # Padding estetika tabel atas & bawah
+            max_h = max_h + 4 
             
             start_x = pdf.get_x()
             start_y = pdf.get_y()
             
-            # Cek batas halaman baru (297mm - margin bawah 25 - pengaman)
             if start_y + max_h > 265: 
                 pdf.add_page()
                 start_y = pdf.get_y()
@@ -263,7 +290,7 @@ if len(st.session_state.keranjang) > 0:
                 
                 align = 'R' if i in [3, 4, 5] else 'C' if i in [1, 2] else 'L'
                 
-                pdf.set_xy(x, y + 2) # Padding teks dalam tabel
+                pdf.set_xy(x, y + 2) 
                 pdf.multi_cell(col_widths[i], 5, str(row[i]), 0, align)
                 pdf.set_xy(x + col_widths[i], start_y)
                 
@@ -274,7 +301,6 @@ if len(st.session_state.keranjang) > 0:
         pdf.multi_cell(0, 5, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan ini, atas perhatian dan kerjasamanya kami ucapkan terimakasih.')
         
         pdf.ln(8) 
-        
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
         y_ttd = pdf.get_y()
@@ -329,22 +355,9 @@ if len(st.session_state.keranjang) > 0:
             
             if found_brosur:
                 try:
-                    pdf.image(found_brosur, w=155) # Lebar 155 disesuaikan area margin baru
+                    pdf.image(found_brosur, w=155) 
                     pdf.ln(3)
                 except: pass
-            else:
-                if not (url_produk and url_produk != '-' and url_produk.startswith('http')):
-                    x_brosur = pdf.get_x()
-                    y_brosur = pdf.get_y()
-                    pdf.set_draw_color(200, 200, 200)
-                    pdf.rect(x_brosur, y_brosur, 155, 20) 
-                    pdf.set_font('Arial', 'I', 9)
-                    pdf.set_text_color(150, 150, 150)
-                    pdf.set_xy(x_brosur, y_brosur + 6)
-                    pdf.cell(155, 5, f"( Detail Brosur tidak tersedia. Tambahkan Link Web pada Master Data )", 0, 1, 'C')
-                    pdf.set_text_color(0, 0, 0)
-                    pdf.set_draw_color(160, 160, 160)
-                    pdf.set_y(y_brosur + 23)
             
             pdf.ln(4)
             
