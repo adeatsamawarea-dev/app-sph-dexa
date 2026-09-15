@@ -3,6 +3,7 @@ import pandas as pd
 from fpdf import FPDF
 import datetime
 import io
+import re
 
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
@@ -13,13 +14,46 @@ def sanitize_text(text):
     if pd.isna(text): return "-"
     return str(text).replace('•', '- ').encode('latin-1', 'replace').decode('latin-1')
 
+# Fungsi cerdas untuk mengatasi error format angka (titik/koma/Rp) di CSV
+def safe_float(val):
+    if pd.isna(val): return 0.0
+    if isinstance(val, (int, float)): return float(val)
+    val_str = str(val).strip()
+    val_str = re.sub(r'[^\d,\.-]', '', val_str) # Hapus karakter selain angka, titik, koma
+    
+    if '.' in val_str and ',' in val_str:
+        if val_str.rfind('.') > val_str.rfind(','):
+            val_str = val_str.replace(',', '')
+        else:
+            val_str = val_str.replace('.', '').replace(',', '.')
+    else:
+        if val_str.count('.') > 1:
+            val_str = val_str.replace('.', '')
+        elif val_str.count(',') > 1:
+            val_str = val_str.replace(',', '')
+        else:
+            if ',' in val_str:
+                parts = val_str.split(',')
+                if len(parts[1]) == 3:
+                    val_str = val_str.replace(',', '')
+                else:
+                    val_str = val_str.replace(',', '.')
+            elif '.' in val_str:
+                parts = val_str.split('.')
+                if len(parts[1]) == 3:
+                    val_str = val_str.replace('.', '')
+    try:
+        return float(val_str)
+    except:
+        return 0.0
+
 # Load Data dengan aman & bersihkan nama kolom
 @st.cache_data
 def load_data():
     df_cust = pd.read_csv("SPH2026_Customer.csv")
     df_prod = pd.read_csv("SPH2026_Master_Obat.csv")
     
-    # Hapus spasi tak kasat mata dari nama kolom untuk menghindari KeyError
+    # Hapus spasi tak kasat mata dari nama kolom
     df_cust.columns = df_cust.columns.str.strip()
     df_prod.columns = df_prod.columns.str.strip()
     
@@ -48,15 +82,18 @@ col1, col2 = st.columns([2, 1])
 with col1:
     selected_produk = st.selectbox("Pilih Produk Obat:", produks)
 with col2:
-    diskon = st.number_input("Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
+    # FORMAT DISKON DIUBAH MENJADI ANGKA BULAT (10, 20, 30, dst)
+    diskon = st.number_input("Diskon (%)", min_value=0, max_value=100, value=0, step=1)
 
 if st.button("➕ Tambah ke SPH", use_container_width=True):
     prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
     
-    # Deteksi nama kolom Harga HNA atau HNA
-    hna_val = 0
-    if 'HNA' in prod_data: hna_val = float(prod_data['HNA'])
-    elif 'Harga Hna' in prod_data: hna_val = float(prod_data['Harga Hna'])
+    # Deteksi dan ubah harga dengan aman ke angka (mencegah ValueError)
+    hna_val = 0.0
+    if 'HNA' in prod_data.index: 
+        hna_val = safe_float(prod_data['HNA'])
+    elif 'Harga Hna' in prod_data.index: 
+        hna_val = safe_float(prod_data['Harga Hna'])
         
     harga_jadi = hna_val - (hna_val * diskon / 100)
     
@@ -69,14 +106,13 @@ if st.button("➕ Tambah ke SPH", use_container_width=True):
         'Harga Jadi': harga_jadi,
         'Indikasi': prod_data.get('Indikasi', '-')
     })
-    st.success(f"Berhasil menambahkan {selected_produk}!")
+    st.success(f"Berhasil menambahkan {selected_produk}! (Gulir ke bawah untuk melihat tabel)")
 
 # ---- TAMPILKAN KERANJANG ----
 if len(st.session_state.keranjang) > 0:
     st.markdown("### 📋 Daftar Produk di SPH ini:")
     df_keranjang = pd.DataFrame(st.session_state.keranjang)
     
-    # Format mata uang untuk tampilan di layar HP
     df_tampil = df_keranjang[['Nama Produk', 'Kemasan', 'Diskon', 'Harga Jadi']].copy()
     df_tampil['Harga Jadi'] = df_tampil['Harga Jadi'].apply(lambda x: f"Rp {x:,.0f}")
     df_tampil['Diskon'] = df_tampil['Diskon'].apply(lambda x: f"{x}%")
@@ -185,5 +221,3 @@ if len(st.session_state.keranjang) > 0:
             mime="application/pdf",
             use_container_width=True
         )
-else:
-    st.info("Silakan pilih produk dan diskon, lalu klik 'Tambah ke SPH' terlebih dahulu.")
