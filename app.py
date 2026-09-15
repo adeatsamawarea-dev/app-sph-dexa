@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Modern & Fresh)")
+st.subheader("Format Portrait (Auto Brosur & Modern)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -148,7 +148,7 @@ if len(st.session_state.keranjang) > 0:
                 self.set_text_color(128)
                 self.cell(0, 10, f'Halaman {self.page_no()}', 0, 0, 'C')
 
-        # === HALAMAN 1: SURAT UTAMA (Margin 7mm, Lebar efektif 196mm) ===
+        # === HALAMAN 1: SURAT UTAMA ===
         pdf = PDF('P', 'mm', 'A4')
         pdf.set_margins(7, 7, 7)
         pdf.add_page()
@@ -173,13 +173,12 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, 'Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :', 0, 1, 'L')
         pdf.ln(3)
         
-        # === TABEL HEADER (Modern Grey Theme #E0E0E0, Total Lebar 196mm) ===
+        # === TABEL HEADER (Modern Grey Theme #E0E0E0) ===
         pdf.set_font('Arial', 'B', 8)
-        pdf.set_fill_color(224, 224, 224) # Abu-abu modern & fresh
+        pdf.set_fill_color(224, 224, 224)
         pdf.set_text_color(40, 40, 40)
         pdf.set_draw_color(180, 180, 180)
         
-        # Kolom disesuaikan agar Nama Produk lebih leluasa, Harga Jadi pas
         col_widths = [56, 45, 15, 10, 25, 12, 33] 
         headers = ['Nama Produk', 'Komposisi', 'Satuan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi / Sat']
         
@@ -246,7 +245,7 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', '', 9)
         pdf.cell(0, 5, 'Regional Lead (PIMDA)', 0, 1, 'L')
         
-        # === HALAMAN 2: LAMPIRAN ===
+        # === HALAMAN 2: LAMPIRAN (AUTO BROSUR / KOTAK) ===
         pdf.add_page()
         pdf.set_font('Arial', 'B', 11)
         pdf.set_text_color(0, 86, 179)
@@ -269,18 +268,35 @@ if len(st.session_state.keranjang) > 0:
             pdf.set_font('Arial', 'B', 9)
             pdf.cell(0, 5, "Brosur Produk:", 0, 1, 'L')
             
-            x_brosur = pdf.get_x()
-            y_brosur = pdf.get_y()
-            pdf.set_draw_color(200, 200, 200)
-            pdf.rect(x_brosur, y_brosur, 196, 28) 
-            pdf.set_font('Arial', 'I', 8)
-            pdf.set_text_color(150, 150, 150)
-            pdf.set_xy(x_brosur, y_brosur + 10)
-            pdf.cell(196, 5, "( Ruang untuk melampirkan gambar/dokumen brosur produk )", 0, 1, 'C')
+            # Deteksi apakah ada file brosur khusus (misal: brosur_NAMA_PRODUK.png)
+            clean_prod_name = re.sub(r'[^\w]', '_', item['Nama Produk'])
+            brosur_file = f"brosur_{clean_prod_name}.png"
+            brosur_file_jpg = f"brosur_{clean_prod_name}.jpg"
             
+            found_brosur = None
+            if os.path.exists(brosur_file): found_brosur = brosur_file
+            elif os.path.exists(brosur_file_jpg): found_brosur = brosur_file_jpg
+            
+            if found_brosur:
+                # Jika file brosur ditemukan, tampilkan gambar aslinya di PDF
+                try:
+                    pdf.image(found_brosur, w=196) # Lebar penuh margin halaman
+                    pdf.ln(3)
+                except:
+                    pass
+            else:
+                # Jika belum ada file brosur, tampilkan kotak panduan kosong
+                x_brosur = pdf.get_x()
+                y_brosur = pdf.get_y()
+                pdf.set_draw_color(200, 200, 200)
+                pdf.rect(x_brosur, y_brosur, 196, 28) 
+                pdf.set_font('Arial', 'I', 8)
+                pdf.set_text_color(150, 150, 150)
+                pdf.set_xy(x_brosur, y_brosur + 10)
+                pdf.cell(196, 5, f"( Upload file '{brosur_file}' ke GitHub untuk menampilkan brosur asli )", 0, 1, 'C')
+                
             pdf.set_text_color(0, 0, 0)
             pdf.set_draw_color(180, 180, 180)
-            pdf.set_y(y_brosur + 32)
             pdf.ln(3)
             
             if pdf.get_y() > 250:
