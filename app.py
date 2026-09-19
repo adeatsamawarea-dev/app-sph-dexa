@@ -69,13 +69,16 @@ produks = df_harga['Nama Produk'].dropna().unique().tolist()
 if 'keranjang' not in st.session_state:
     st.session_state.keranjang = []
 
+# ---- FORM INPUT OUTLET ----
+st.markdown("### 1. Pilih Outlet / Rumah Sakit")
+selected_outlet = st.selectbox("Outlet:", outlets, label_visibility="collapsed")
+
 # ---- FORM INPUT PRODUK ----
 st.markdown("### 2. Tambah Produk ke SPH")
 
-# 1. Bersihkan kolom pilih obat di awal (index=None)
+# Bersihkan kolom pilih obat di awal
 selected_produk = st.selectbox("Pilih Produk Obat:", produks, index=None, placeholder="Pilih Produk Obat...")
 
-# Form input diskon dan harga baru akan muncul JIKA obat sudah dipilih
 if selected_produk:
     prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
     hna_val = 0.0
@@ -88,26 +91,22 @@ if selected_produk:
 
     if metode == "Diskon (%)":
         diskon = st.number_input("Input Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
-        # 2. Rumus: HNA dikurangi diskon, KEMUDIAN DITAMBAH PPN 11%
+        # Rumus PPN 11% dimasukkan ke Harga Jadi
         harga_setelah_diskon = hna_val - (hna_val * diskon / 100)
         harga_jadi = round(harga_setelah_diskon * 1.11)
     else:
-        # 3. Input harga jadi tampil bulat, step naik-turun per Rp 1.000
-        default_harga = int(round(hna_val * 1.11)) # Default harga sudah termasuk PPN 0% diskon
+        default_harga = int(round(hna_val * 1.11))
         harga_jadi = st.number_input("Input Harga Jadi (Rp)", min_value=0, value=default_harga, step=1000, format="%d")
         
-        # Hitung mundur diskon (Meluarkan PPN 11% dulu dari harga jadi)
+        # Ekstrak PPN 11% dulu dari harga jadi untuk mencari diskon murni
         harga_sebelum_ppn = harga_jadi / 1.11
         if hna_val > 0:
             diskon = round(((hna_val - harga_sebelum_ppn) / hna_val) * 100, 2)
         else:
             diskon = 0.0
 
-    # --- PREVIEW BANTUAN HNA & HARGA JADI (LIVE) ---
-    # 4. Info box disesuaikan untuk mencantumkan label "+ PPN 11%"
     st.info(f"💡 **Preview:** HNA **Rp {hna_val:,.0f}** | Diskon **{diskon:g}%** | + PPN 11% ➡️ Harga Akhir **Rp {harga_jadi:,.0f}**")
 
-    # Tombol untuk memasukkan ke keranjang
     if st.button("➕ Tambah ke SPH", use_container_width=True):
         st.session_state.keranjang.append({
             'Nama Produk': selected_produk,
@@ -118,7 +117,7 @@ if selected_produk:
             'Indikasi': prod_data.get('Indikasi', '-')
         })
         st.success(f"Berhasil menambahkan {selected_produk}! (Gulir ke bawah)")
-    
+
 # ---- TAMPILKAN KERANJANG ----
 if len(st.session_state.keranjang) > 0:
     st.markdown("### 📋 Daftar Produk di SPH ini:")
