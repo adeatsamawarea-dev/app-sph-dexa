@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Revisi Lengkap & Profesional)")
+st.subheader("Format Portrait (Fixed Checkbox & Master Update)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -41,7 +41,8 @@ def safe_float(val):
     try: return float(val_str)
     except: return 0.0
 
-@st.cache_data
+# Menggunakan st.cache_data(ttl=0) agar setiap perubahan di CSV langsung terbaca tanpa nyangkut di memori
+@st.cache_data(ttl=0)
 def load_data():
     df_cust = pd.read_csv("SPH2026_Customer.csv")
     df_prod = pd.read_csv("SPH2026_Master_Obat.csv")
@@ -76,7 +77,11 @@ elif 'Harga Hna' in prod_data.index: hna_val = safe_float(prod_data['Harga Hna']
 isi_val = safe_float(prod_data.get('Isi', 1))
 if isi_val <= 0: isi_val = 1
 
+# Membaca kolom Kemasan / Satuan dari Master Obat yang baru di-update
 kemasan_val = prod_data.get('Kemasan', prod_data.get('Satuan', '-'))
+if pd.isna(kemasan_val) or str(kemasan_val).strip() == '':
+    kemasan_val = prod_data.get('Satuan', '-')
+
 link_web_val = prod_data.get('Link Web', '')
 if pd.isna(link_web_val): link_web_val = ''
 
@@ -114,16 +119,13 @@ else:
     diskon_final = round(diskon_kalkulasi, 2)
     harga_jadi_final = harga_input
 
-# --- OPSI LAMPIRAN HALAMAN 2 ---
-tampilkan_lampiran = st.checkbox("Sertakan Halaman Kedua (Lampiran Detail & Website)", value=True)
-
 # --- TOMBOL TAMBAH ---
 if st.button("➕ Tambah ke SPH", use_container_width=True):
     st.session_state.keranjang.append({
         'Nama Produk': selected_produk,
         'Komposisi': prod_data.get('Komposisi', '-'),
         'Indikasi': prod_data.get('Indikasi', '-'),
-        'Kemasan': kemasan_val,
+        'Kemasan': str(kemasan_val),
         'Isi': int(isi_val),
         'HNA': hna_val,
         'Diskon': diskon_final,
@@ -136,7 +138,7 @@ if len(st.session_state.keranjang) > 0:
     st.markdown("### 📋 Daftar Produk di SPH:")
     df_keranjang = pd.DataFrame(st.session_state.keranjang)
     
-    df_tampil = df_keranjang[['Nama Produk', 'Diskon', 'Harga Jadi Satuan']].copy()
+    df_tampil = df_keranjang[['Nama Produk', 'Kemasan', 'Diskon', 'Harga Jadi Satuan']].copy()
     df_tampil['Harga Jadi Satuan'] = df_tampil['Harga Jadi Satuan'].apply(lambda x: f"Rp {x:,.0f}")
     df_tampil['Diskon'] = df_tampil['Diskon'].apply(lambda x: f"{x}%")
     st.table(df_tampil)
@@ -147,6 +149,10 @@ if len(st.session_state.keranjang) > 0:
 
     st.markdown("---")
     
+    # --- OPSI LAMPIRAN HALAMAN 2 (Checkbox Jelas) ---
+    st.markdown("### ⚙️ Pengaturan Dokumen PDF")
+    tampilkan_lampiran = st.checkbox("📄 Sertakan Halaman Kedua (Lampiran Detail & Website)", value=True)
+
     # --- GENERATE PDF ---
     if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_width=True):
         cust_data = df_customer[df_customer['Nama Outlet'] == selected_outlet].iloc[0]
@@ -195,7 +201,7 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, f'Surakarta, {tgl_sekarang}', 0, 1, 'R')
         
         pdf.ln(3)
-        pdf.set_font('Arial', 'BU', 11) # B = Bold, U = Underline (Perihal digarisbawahi)
+        pdf.set_font('Arial', 'BU', 11) # Perihal digarisbawahi
         pdf.cell(0, 5, 'Perihal : Surat Penawaran Harga', 0, 1, 'L')
         
         pdf.ln(8) 
@@ -204,24 +210,23 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, 'Kepala Farmasi', 0, 1, 'L')
         nama_outlet_str = sanitize_text(cust_data.get('Nama Outlet', '-'))
         pdf.cell(0, 5, nama_outlet_str, 0, 1, 'L')
-        pdf.cell(0, 5, 'di Tempat', 0, 1, 'L') # Ditambahkan "di Tempat"
+        pdf.cell(0, 5, 'di Tempat', 0, 1, 'L')
         
         pdf.ln(6) 
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 5, 'Dengan hormat,', 0, 1, 'L')
         
-        # Kalimat pembuka baru sesuai permintaan
-        kalimat_pembuka = f"Sebelumnya kami menyampaikan terimakasih kepada {nama_outlet_str} atas kepercayaan dan kerjasama yang telah terjalin dengan baik selama ini dengan PT Dexa Medica. Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :"
+        kalimat_pembuka = f"Sebelumnya kami menyampaikan terimakasih kepada {nama_outlet_str} atas kepercayaan dan kerjasama yang telah terjalin dengan baik selama ini dengan PT Dexa Medica . Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :"
         pdf.multi_cell(0, 5, kalimat_pembuka)
         pdf.ln(4)
         
-        # === TABEL HEADER (Nama Produk, Komposisi, Kemasan, Isi, HNA, Harga Jadi) ===
+        # === TABEL HEADER ===
         pdf.set_font('Arial', 'B', 8.5)
         pdf.set_fill_color(235, 235, 235) 
         pdf.set_text_color(30, 30, 30)
         pdf.set_draw_color(160, 160, 160) 
         
-        col_widths = [35, 45, 18, 9, 21, 27] # Total lebar 155mm
+        col_widths = [35, 45, 18, 9, 21, 27] 
         headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Jadi\n(Sat/Terkecil)']
         
         start_x = pdf.get_x()
@@ -291,20 +296,18 @@ if len(st.session_state.keranjang) > 0:
         pdf.ln(6) 
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
-        # QR Code diletakkan DI ATAS nama penandatangan
         y_qr = pdf.get_y()
         if os.path.exists(qr_path):
             pdf.image(qr_path, 30, y_qr + 2, 20)
             
-        pdf.ln(24) # Ruang untuk QR Code
+        pdf.ln(24)
         pdf.set_font('Arial', 'B', 10)
         pdf.cell(0, 5, 'Ade Budi Susetyo', 0, 1, 'L')
         
-        # Jabatan: Lebih kecil (8.5 pt) dan Miring (Italic)
         pdf.set_font('Arial', 'I', 8.5)
         pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
         
-        # === HALAMAN 2: LAMPIRAN (JIKA DIPILIH) ===
+        # === HALAMAN 2: LAMPIRAN (Hanya dicetak jika Checkbox dicentang) ===
         if tampilkan_lampiran:
             pdf.add_page()
             pdf.set_font('Arial', 'B', 11)
