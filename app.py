@@ -5,7 +5,7 @@ import datetime
 import math
 import re
 import os
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import qrcode
 
 st.set_page_config(page_title="SPH - Solhays 2026", page_icon="📄", layout="centered")
@@ -132,8 +132,43 @@ if len(st.session_state.keranjang) > 0:
                     background = Image.new('RGB', img.size, (255, 255, 255)); background.paste(img, mask=img.split()[-1]); background.save(logo_png, "PNG")
                 else: img.save(logo_png, "PNG")
             except: pass
+
         qr_path = "ttd_qr.png"
-        qr = qrcode.QRCode(version=1, box_size=10, border=2); qr.add_data("https://portal.dexagroup.com/ebc/?i=DX013070722"); qr.make(fit=True); qr.make_image(fill_color="black", back_color="white").save(qr_path)
+        qrcode_data = "https://portal.dexagroup.com/ebc/?i=DX013070722"
+        qr = qrcode.QRCode(version=4, error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=8, border=2)
+        qr.add_data(qrcode_data)
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill_color="black", back_color="white").convert("RGBA")
+
+        canvas = Image.new("RGBA", (qr_img.width + 80, qr_img.height + 80), (255, 255, 255, 255))
+        canvas.paste(qr_img, (40, 40))
+
+        badge_w = int(qr_img.width * 0.48)
+        badge_h = int(qr_img.height * 0.18)
+        badge = Image.new("RGBA", (badge_w, badge_h), (255, 255, 255, 255))
+        draw = ImageDraw.Draw(badge)
+        draw.rounded_rectangle((0, 0, badge_w - 1, badge_h - 1), radius=10, fill=(255, 255, 255, 255), outline=(0, 0, 0, 255), width=2)
+
+        tri = [(badge_w * 0.12, badge_h * 0.8), (badge_w * 0.5, badge_h * 0.1), (badge_w * 0.88, badge_h * 0.8)]
+        draw.polygon(tri, fill=(220, 0, 0, 255))
+        draw.polygon([(badge_w * 0.12, badge_h * 0.8), (badge_w * 0.5, badge_h * 0.1), (badge_w * 0.88, badge_h * 0.8)], outline=(0, 0, 0, 255), width=2)
+
+        try:
+            font_big = ImageFont.truetype("DejaVuSans-Bold.ttf", max(18, int(badge_h * 0.42)))
+            font_small = ImageFont.truetype("DejaVuSans.ttf", max(11, int(badge_h * 0.22)))
+        except Exception:
+            font_big = ImageFont.load_default()
+            font_small = ImageFont.load_default()
+
+        text_x = badge_w * 0.52
+        draw.text((text_x, badge_h * 0.22), "Dexa", fill=(0, 0, 0, 255), anchor="mm", font=font_big)
+        draw.text((text_x, badge_h * 0.65), "Medical", fill=(0, 0, 0, 255), anchor="mm", font=font_small)
+
+        badge_x = (canvas.width - badge_w) // 2
+        badge_y = (canvas.height - badge_h) // 2
+        canvas.paste(badge, (badge_x, badge_y), badge)
+        canvas.save(qr_path)
+
         ttd_path, has_uploaded_ttd = "ttd_upload_temp.png", False
         if upload_ttd is not None:
             try: Image.open(upload_ttd).save(ttd_path, "PNG"); has_uploaded_ttd = True
@@ -174,9 +209,8 @@ if len(st.session_state.keranjang) > 0:
             pdf.ln(max_h)
         pdf.ln(5); pdf.set_font('Arial', '', 10); pdf.multi_cell(0, 6, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan ini, atas perhatian dan kerjasamanya kami ucapkan terima kasih.'); pdf.ln(4); pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
 
-        # --- BLOK TANDA TANGAN SESUAI CONTOH ---
         y_ttd = pdf.get_y() + 2
-        qr_w = 34
+        qr_w = 38
         qr_x = 30 + (pdf.w - 60 - qr_w) / 2
         if has_uploaded_ttd:
             try:
