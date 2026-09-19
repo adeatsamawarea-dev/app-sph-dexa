@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH - Solhays 2026", page_icon="📄", layout="centered")
 
 st.title("📄 SPH - Solhays 2026")
-st.subheader("Format Portrait (Tata Letak TTD & Nama Rapi)")
+st.subheader("Format Portrait (Tanda Tangan & Logo Disempurnakan)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -60,7 +60,7 @@ if 'keranjang' not in st.session_state:
 
 # --- ANTARMUKA APLIKASI ---
 
-# 1. PILIH AREA MANAGER (AM) DI PALING ATAS
+# 1. PILIH AREA MANAGER (AM)
 st.markdown("### 1. Pilih Area Manager (AM)")
 pilihan_am = [
     "Ade Budi Susetyo",
@@ -178,12 +178,19 @@ if len(st.session_state.keranjang) > 0:
     if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_width=True):
         cust_data = df_customer[df_customer['Nama Outlet'] == selected_outlet].iloc[0]
         
-        logo_path = "logoDX.webp"
+        # --- PERUBAHAN LOGO SESUAI PERMINTAAN ---
+        logo_path = "PT-DEXA-MEDICA.png"
         logo_png = "logo_temp.png"
         if os.path.exists(logo_path):
             try:
                 img = Image.open(logo_path)
-                img.save(logo_png, "PNG")
+                # Pastikan background transparan menjadi putih untuk PDF
+                if img.mode in ('RGBA', 'LA'):
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    background.paste(img, mask=img.split()[-1])
+                    background.save(logo_png, "PNG")
+                else:
+                    img.save(logo_png, "PNG")
             except: pass
             
         qr_path = "ttd_qr.png"
@@ -322,38 +329,49 @@ if len(st.session_state.keranjang) > 0:
             
         pdf.ln(5)
         pdf.set_font('Arial', '', 10)
-        pdf.multi_cell(0, 6, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan-atas perhatian dan kerjasamanya kami ucapkan terimakasih.')
+        pdf.multi_cell(0, 6, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan ini, atas perhatian dan kerjasamanya kami ucapkan terimakasih.')
         
         pdf.ln(4) 
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
-        # --- TANDA TANGAN / QR CODE DI ATAS, NAMA DI BAWAHNYA ---
+        # --- BLOK TANDA TANGAN RAPI & RATA TENGAH (CENTERED) ---
         y_ttd = pdf.get_y()
+        
+        # Hitung lebar area untuk menengahkan gambar dan teks
+        pdf.set_font('Arial', 'BU', 10)
+        w_name = pdf.get_string_width(selected_am)
+        pdf.set_font('Arial', 'I', 8.5)
+        w_title = pdf.get_string_width('Area Manager')
+        
+        w_block = max(w_name, w_title) + 5
+        center_x = 30 + (w_block / 2) # Titik tengah dari keseluruhan blok
         
         if has_uploaded_ttd:
             try:
-                pdf.image(ttd_path, 30, y_ttd + 2, w=25) # Gambar TTD
-                y_next = y_ttd + 16 # Jarak turun setelah gambar TTD
+                img_w = 20 # Gambar TTD lebar 20mm
+                pdf.image(ttd_path, center_x - (img_w/2), y_ttd + 2, w=img_w)
+                y_next = y_ttd + 16 # Turun setelah gambar
             except: 
                 y_next = y_ttd + 2
         else:
             if os.path.exists(qr_path):
-                pdf.image(qr_path, 30, y_ttd + 2, w=18) # QR Code kecil
-                y_next = y_ttd + 20 # Jarak turun setelah QR Code
+                img_w = 14 # QR Code lebih kecil (lebar 14mm)
+                pdf.image(qr_path, center_x - (img_w/2), y_ttd + 2, w=img_w)
+                y_next = y_ttd + 18 # Jarak aman di bawah QR code
             else:
                 y_next = y_ttd + 2
-            
-        # Nama Area Manager di bawah tanda tangan
+                
+        # Menampilkan Nama di tengah-tengah secara presisi di bawah gambar
         pdf.set_xy(30, y_next)
-        pdf.set_font('Arial', 'BU', 10) # Digarisbawahi (Underline)
-        pdf.cell(0, 5, selected_am, 0, 1, 'L')
+        pdf.set_font('Arial', 'BU', 10) 
+        pdf.cell(w_block, 5, selected_am, 0, 1, 'C') # 'C' = Center
         
-        # Jabatan Area Manager agak rapat di bawah nama
-        pdf.set_xy(30, y_next + 5)
+        # Menampilkan Jabatan rapat di bawah nama secara presisi
+        pdf.set_xy(30, y_next + 4.5)
         pdf.set_font('Arial', 'I', 8.5)
-        pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
+        pdf.cell(w_block, 4, 'Area Manager', 0, 1, 'C') 
         
-        pdf.ln(15) # Jarak ke bawah
+        pdf.ln(15) 
         
         # === HALAMAN 2: LAMPIRAN ===
         if tampilkan_lampiran:
