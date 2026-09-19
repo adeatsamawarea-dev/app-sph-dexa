@@ -72,44 +72,52 @@ if 'keranjang' not in st.session_state:
 # ---- FORM INPUT PRODUK ----
 st.markdown("### 2. Tambah Produk ke SPH")
 
-selected_produk = st.selectbox("Pilih Produk Obat:", produks)
+# 1. Bersihkan kolom pilih obat di awal (index=None)
+selected_produk = st.selectbox("Pilih Produk Obat:", produks, index=None, placeholder="Pilih Produk Obat...")
 
-# Tarik data HNA produk terlebih dahulu agar bisa dijadikan acuan hitung
-prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
-hna_val = 0.0
-if 'HNA' in prod_data.index: 
-    hna_val = safe_float(prod_data['HNA'])
-elif 'Harga Hna' in prod_data.index: 
-    hna_val = safe_float(prod_data['Harga Hna'])
+# Form input diskon dan harga baru akan muncul JIKA obat sudah dipilih
+if selected_produk:
+    prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
+    hna_val = 0.0
+    if 'HNA' in prod_data.index: 
+        hna_val = safe_float(prod_data['HNA'])
+    elif 'Harga Hna' in prod_data.index: 
+        hna_val = safe_float(prod_data['Harga Hna'])
 
-# Pilihan 2 Metode Input
-metode = st.radio("Atur harga berdasarkan:", ["Diskon (%)", "Harga Jadi (Rp)"], horizontal=True)
+    metode = st.radio("Atur harga berdasarkan:", ["Diskon (%)", "Harga Jadi (Rp)"], horizontal=True)
 
-if metode == "Diskon (%)":
-    diskon = st.number_input("Input Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
-    harga_jadi = round(hna_val - (hna_val * diskon / 100))
-else:
-    harga_jadi = st.number_input("Input Harga Jadi (Rp)", min_value=0.0, value=float(hna_val), step=100.0)
-    # Hitung mundur persentase diskon berdasarkan harga jadi
-    if hna_val > 0:
-        diskon = round(((hna_val - harga_jadi) / hna_val) * 100, 2)
+    if metode == "Diskon (%)":
+        diskon = st.number_input("Input Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
+        # 2. Rumus: HNA dikurangi diskon, KEMUDIAN DITAMBAH PPN 11%
+        harga_setelah_diskon = hna_val - (hna_val * diskon / 100)
+        harga_jadi = round(harga_setelah_diskon * 1.11)
     else:
-        diskon = 0.0
+        # 3. Input harga jadi tampil bulat, step naik-turun per Rp 1.000
+        default_harga = int(round(hna_val * 1.11)) # Default harga sudah termasuk PPN 0% diskon
+        harga_jadi = st.number_input("Input Harga Jadi (Rp)", min_value=0, value=default_harga, step=1000, format="%d")
+        
+        # Hitung mundur diskon (Meluarkan PPN 11% dulu dari harga jadi)
+        harga_sebelum_ppn = harga_jadi / 1.11
+        if hna_val > 0:
+            diskon = round(((hna_val - harga_sebelum_ppn) / hna_val) * 100, 2)
+        else:
+            diskon = 0.0
 
-# --- PREVIEW BANTUAN HNA & HARGA JADI (LIVE) ---
-st.info(f"💡 **Preview:** HNA **Rp {hna_val:,.0f}** | Diskon **{diskon:g}%** ➡️ Harga Akhir **Rp {harga_jadi:,.0f}**")
+    # --- PREVIEW BANTUAN HNA & HARGA JADI (LIVE) ---
+    # 4. Info box disesuaikan untuk mencantumkan label "+ PPN 11%"
+    st.info(f"💡 **Preview:** HNA **Rp {hna_val:,.0f}** | Diskon **{diskon:g}%** | + PPN 11% ➡️ Harga Akhir **Rp {harga_jadi:,.0f}**")
 
-# Tombol untuk memasukkan ke keranjang
-if st.button("➕ Tambah ke SPH", use_container_width=True):
-    st.session_state.keranjang.append({
-        'Nama Produk': selected_produk,
-        'Kemasan': prod_data.get('Kemasan', '-'),
-        'HNA': hna_val,
-        'Diskon': diskon,
-        'Harga Jadi': harga_jadi,
-        'Indikasi': prod_data.get('Indikasi', '-')
-    })
-    st.success(f"Berhasil menambahkan {selected_produk}! (Gulir ke bawah)")
+    # Tombol untuk memasukkan ke keranjang
+    if st.button("➕ Tambah ke SPH", use_container_width=True):
+        st.session_state.keranjang.append({
+            'Nama Produk': selected_produk,
+            'Kemasan': prod_data.get('Kemasan', '-'),
+            'HNA': hna_val,
+            'Diskon': diskon,
+            'Harga Jadi': harga_jadi,
+            'Indikasi': prod_data.get('Indikasi', '-')
+        })
+        st.success(f"Berhasil menambahkan {selected_produk}! (Gulir ke bawah)")
     
 # ---- TAMPILKAN KERANJANG ----
 if len(st.session_state.keranjang) > 0:
