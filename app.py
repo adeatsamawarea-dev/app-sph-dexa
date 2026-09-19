@@ -350,14 +350,14 @@ if len(st.session_state.keranjang) > 0:
             try:
                 img_w = 20 # Gambar TTD lebar 20mm
                 pdf.image(ttd_path, center_x - (img_w/2), y_ttd + 2, w=img_w)
-                y_next = y_ttd + 16 # Turun setelah gambar
+                y_next = y_ttd + 14 # Turun setelah gambar
             except: 
                 y_next = y_ttd + 2
         else:
             if os.path.exists(qr_path):
                 img_w = 14 # QR Code lebih kecil (lebar 14mm)
                 pdf.image(qr_path, center_x - (img_w/2), y_ttd + 2, w=img_w)
-                y_next = y_ttd + 18 # Jarak aman di bawah QR code
+                y_next = y_ttd + 14 # Jarak aman di bawah QR code
             else:
                 y_next = y_ttd + 2
                 
