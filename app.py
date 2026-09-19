@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH - Solhays 2026", page_icon="📄", layout="centered")
 
 st.title("📄 SPH - Solhays 2026")
-st.subheader("Format Portrait (Tanda Tangan & Tampilan Rapi)")
+st.subheader("Format Portrait (Tata Letak TTD & Nama Rapi)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -322,33 +322,38 @@ if len(st.session_state.keranjang) > 0:
             
         pdf.ln(5)
         pdf.set_font('Arial', '', 10)
-        pdf.multi_cell(0, 6, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan ini, atas perhatian dan kerjasamanya kami ucapkan terimakasih.')
+        pdf.multi_cell(0, 6, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan-atas perhatian dan kerjasamanya kami ucapkan terimakasih.')
         
-        pdf.ln(5) 
+        pdf.ln(4) 
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
-        # --- TANDA TANGAN / QR CODE KECIL DI KIRI, NAMA DIKANANNYA & DIGARISBAWAHI ---
+        # --- TANDA TANGAN / QR CODE DI ATAS, NAMA DI BAWAHNYA ---
         y_ttd = pdf.get_y()
         
         if has_uploaded_ttd:
             try:
-                pdf.image(ttd_path, 30, y_ttd + 2, w=22) # Gambar TTD kecil
-            except: pass
+                pdf.image(ttd_path, 30, y_ttd + 2, w=25) # Gambar TTD
+                y_next = y_ttd + 16 # Jarak turun setelah gambar TTD
+            except: 
+                y_next = y_ttd + 2
         else:
             if os.path.exists(qr_path):
-                pdf.image(qr_path, 30, y_ttd + 2, w=15) # QR code diperkecil 15mm
+                pdf.image(qr_path, 30, y_ttd + 2, w=18) # QR Code kecil
+                y_next = y_ttd + 20 # Jarak turun setelah QR Code
+            else:
+                y_next = y_ttd + 2
             
-        # Nama Area Manager diatur di sebelah kanan gambar (X = 52) sejajar vertikal
-        pdf.set_xy(52, y_ttd + 3)
-        pdf.set_font('Arial', 'BU', 10) # B = Bold, U = Underline (Digarisbawahi)
+        # Nama Area Manager di bawah tanda tangan
+        pdf.set_xy(30, y_next)
+        pdf.set_font('Arial', 'BU', 10) # Digarisbawahi (Underline)
         pdf.cell(0, 5, selected_am, 0, 1, 'L')
         
-        # Jabatan di bawahnya agak mepet
-        pdf.set_x(52)
+        # Jabatan Area Manager agak rapat di bawah nama
+        pdf.set_xy(30, y_next + 5)
         pdf.set_font('Arial', 'I', 8.5)
         pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
         
-        pdf.ln(10) # Jarak ke bawah setelah blok tanda tangan
+        pdf.ln(15) # Jarak ke bawah
         
         # === HALAMAN 2: LAMPIRAN ===
         if tampilkan_lampiran:
