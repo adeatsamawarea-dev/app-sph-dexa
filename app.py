@@ -335,7 +335,7 @@ if len(st.session_state.keranjang) > 0:
         if has_uploaded_ttd:
             try:
                 # Ukuran diperkecil lebar 22mm agar proporsional dan rapi
-                pdf.image(ttd_path, 30, y_qr + 2, w=22) 
+                pdf.image(ttd_path, 28, y_qr + 2, w=22) 
             except: pass
         else:
             if os.path.exists(qr_path):
