@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Filter AM & Single TTD)")
+st.subheader("Format Portrait (Perbaikan Ukuran TTD/QR)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -58,7 +58,7 @@ except Exception as e:
 if 'keranjang' not in st.session_state:
     st.session_state.keranjang = []
 
-# --- ANTARMUKA APLIKASI (URUTAN SESUAI PERMINTAAN) ---
+# --- ANTARMUKA APLIKASI ---
 
 # 1. PILIH AREA MANAGER (AM) DI PALING ATAS
 st.markdown("### 1. Pilih Area Manager (AM)")
@@ -74,7 +74,7 @@ upload_ttd = st.file_uploader(f"Upload Tanda Tangan / Paraf untuk {selected_am} 
 
 st.markdown("---")
 
-# 2. PILIH OUTLET (Tersaring otomatis jika ada kolom AM di CSV, jika tidak ada tampil semua)
+# 2. PILIH OUTLET
 st.markdown("### 2. Pilih Outlet / Rumah Sakit")
 if 'AM' in df_customer.columns:
     df_filtered_cust = df_customer[df_customer['AM'].astype(str).str.contains(selected_am, case=False, na=False)]
@@ -329,18 +329,21 @@ if len(st.session_state.keranjang) > 0:
         pdf.ln(5) 
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
-        # --- BAGIAN TANDA TANGAN (TIDAK DOBEL) ---
+        # --- BAGIAN TANDA TANGAN (UKURAN DIPERKECIL & AMAN TIDAK MENUTUPI NAMA) ---
         y_qr = pdf.get_y()
         
         if has_uploaded_ttd:
             try:
-                pdf.image(ttd_path, 30, y_qr + 2, 35) 
+                # Ukuran diperkecil lebar 22mm agar proporsional dan rapi
+                pdf.image(ttd_path, 30, y_qr + 2, w=22) 
             except: pass
         else:
             if os.path.exists(qr_path):
-                pdf.image(qr_path, 30, y_qr + 2, 20)
+                # Ukuran QR code diperkecil lebar 18mm
+                pdf.image(qr_path, 30, y_qr + 2, w=18)
             
-        pdf.ln(24)
+        # Jarak turun (ln) dilebarkan agar teks nama berada di bawah gambar dengan aman
+        pdf.ln(22)
         
         pdf.set_font('Arial', 'B', 10)
         pdf.cell(0, 5, selected_am, 0, 1, 'L')
