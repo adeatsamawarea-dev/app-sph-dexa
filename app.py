@@ -147,7 +147,7 @@ if len(st.session_state.keranjang) > 0:
     
     df_tampil = df_keranjang[['Nama Produk', 'Diskon', 'Harga Jadi Satuan']].copy()
     df_tampil['Harga Jadi Satuan'] = df_tampil['Harga Jadi Satuan'].apply(lambda x: f"Rp {x:,.0f}")
-    df_tampil['Diskon'] = df_tampil['Diskon'].apply(lambda x: f"{x}%")
+    df_tampil['Diskon'] = df_tampil['Diskon'].apply(lambda x: f"{x:g}%")
     st.table(df_tampil)
     
     if st.button("🗑️ Hapus Semua Produk", type="secondary"):
