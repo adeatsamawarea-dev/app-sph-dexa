@@ -69,30 +69,33 @@ produks = df_harga['Nama Produk'].dropna().unique().tolist()
 if 'keranjang' not in st.session_state:
     st.session_state.keranjang = []
 
-# ---- FORM INPUT ----
-st.markdown("### 1. Pilih Outlet / Rumah Sakit")
-selected_outlet = st.selectbox("Outlet:", outlets, label_visibility="collapsed")
-
+# ---- FORM INPUT PRODUK ----
 st.markdown("### 2. Tambah Produk ke SPH")
+
 col1, col2 = st.columns([2, 1])
 with col1:
     selected_produk = st.selectbox("Pilih Produk Obat:", produks)
 with col2:
-    # Diskon disesuaikan agar menerima input desimal (koma)
+    # Kolom input diskon (bisa diketik desimal seperti 1.5 atau 10)
     diskon = st.number_input("Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
 
+# --- PREVIEW BANTUAN HNA & HARGA JADI (LIVE) ---
+# Tarik data produk saat ini tanpa harus menekan tombol
+prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
+hna_val = 0.0
+if 'HNA' in prod_data.index: 
+    hna_val = safe_float(prod_data['HNA'])
+elif 'Harga Hna' in prod_data.index: 
+    hna_val = safe_float(prod_data['Harga Hna'])
+    
+# Perhitungan harga jadi yang otomatis berubah saat diskon diubah
+harga_jadi = round(hna_val - (hna_val * diskon / 100))
+
+# Tampilkan kotak info harga
+st.info(f"💡 **Preview Harga:** HNA **Rp {hna_val:,.0f}** ➡️ Harga Setelah Diskon: **Rp {harga_jadi:,.0f}**")
+
+# Tombol untuk memasukkan ke keranjang/tabel
 if st.button("➕ Tambah ke SPH", use_container_width=True):
-    prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
-    
-    hna_val = 0.0
-    if 'HNA' in prod_data.index: 
-        hna_val = safe_float(prod_data['HNA'])
-    elif 'Harga Hna' in prod_data.index: 
-        hna_val = safe_float(prod_data['Harga Hna'])
-        
-    # Penambahan fungsi round() untuk akurasi presisi desimal
-    harga_jadi = round(hna_val - (hna_val * diskon / 100))
-    
     st.session_state.keranjang.append({
         'Nama Produk': selected_produk,
         'Kemasan': prod_data.get('Kemasan', '-'),
@@ -102,7 +105,7 @@ if st.button("➕ Tambah ke SPH", use_container_width=True):
         'Indikasi': prod_data.get('Indikasi', '-')
     })
     st.success(f"Berhasil menambahkan {selected_produk}! (Gulir ke bawah)")
-
+    
 # ---- TAMPILKAN KERANJANG ----
 if len(st.session_state.keranjang) > 0:
     st.markdown("### 📋 Daftar Produk di SPH ini:")
