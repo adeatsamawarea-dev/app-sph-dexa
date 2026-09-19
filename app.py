@@ -72,29 +72,34 @@ if 'keranjang' not in st.session_state:
 # ---- FORM INPUT PRODUK ----
 st.markdown("### 2. Tambah Produk ke SPH")
 
-col1, col2 = st.columns([2, 1])
-with col1:
-    selected_produk = st.selectbox("Pilih Produk Obat:", produks)
-with col2:
-    # Kolom input diskon (bisa diketik desimal seperti 1.5 atau 10)
-    diskon = st.number_input("Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
+selected_produk = st.selectbox("Pilih Produk Obat:", produks)
 
-# --- PREVIEW BANTUAN HNA & HARGA JADI (LIVE) ---
-# Tarik data produk saat ini tanpa harus menekan tombol
+# Tarik data HNA produk terlebih dahulu agar bisa dijadikan acuan hitung
 prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
 hna_val = 0.0
 if 'HNA' in prod_data.index: 
     hna_val = safe_float(prod_data['HNA'])
 elif 'Harga Hna' in prod_data.index: 
     hna_val = safe_float(prod_data['Harga Hna'])
-    
-# Perhitungan harga jadi yang otomatis berubah saat diskon diubah
-harga_jadi = round(hna_val - (hna_val * diskon / 100))
 
-# Tampilkan kotak info harga
-st.info(f"💡 **Preview Harga:** HNA **Rp {hna_val:,.0f}** ➡️ Harga Setelah Diskon: **Rp {harga_jadi:,.0f}**")
+# Pilihan 2 Metode Input
+metode = st.radio("Atur harga berdasarkan:", ["Diskon (%)", "Harga Jadi (Rp)"], horizontal=True)
 
-# Tombol untuk memasukkan ke keranjang/tabel
+if metode == "Diskon (%)":
+    diskon = st.number_input("Input Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
+    harga_jadi = round(hna_val - (hna_val * diskon / 100))
+else:
+    harga_jadi = st.number_input("Input Harga Jadi (Rp)", min_value=0.0, value=float(hna_val), step=100.0)
+    # Hitung mundur persentase diskon berdasarkan harga jadi
+    if hna_val > 0:
+        diskon = round(((hna_val - harga_jadi) / hna_val) * 100, 2)
+    else:
+        diskon = 0.0
+
+# --- PREVIEW BANTUAN HNA & HARGA JADI (LIVE) ---
+st.info(f"💡 **Preview:** HNA **Rp {hna_val:,.0f}** | Diskon **{diskon:g}%** ➡️ Harga Akhir **Rp {harga_jadi:,.0f}**")
+
+# Tombol untuk memasukkan ke keranjang
 if st.button("➕ Tambah ke SPH", use_container_width=True):
     st.session_state.keranjang.append({
         'Nama Produk': selected_produk,
