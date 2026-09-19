@@ -10,8 +10,8 @@ import qrcode
 
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
-st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Tambah Nama SPV & Upload TTD)")
+st.title("📄 SPH - SOLHAYS 2026 ")
+st.subheader("Format Portrait (Dropdown AM & Tanda Tangan Digital)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -147,12 +147,20 @@ if len(st.session_state.keranjang) > 0:
 
     st.markdown("---")
     
-    # --- PENGATURAN DOKUMEN & TANDA TANGAN ---
+    # --- PENGATURAN DOKUMEN & DROPDOWN PENANDATANGAN ---
     st.markdown("### ⚙️ Pengaturan Dokumen & Penandatangan")
     tampilkan_lampiran = st.checkbox("📄 Sertakan Halaman Kedua (Lampiran Detail & Website)", value=True)
     
-    nama_spv = st.text_input("Nama SPV (Supervisor) — *Kosongkan jika tidak ada*", value="")
-    upload_ttd = st.file_uploader("Upload Tanda Tangan Digital (Opsional - Format PNG/JPG)", type=["png", "jpg", "jpeg"])
+    # Menu Dropdown Nama Area Manager
+    pilihan_am = [
+        "Ade Budi Susetyo",
+        "Kusriyanto",
+        "Pratama Angga Budiantoro Putro"
+    ]
+    selected_am = st.selectbox("Pilih Nama Area Manager (AM):", pilihan_am)
+    
+    # Upload Tanda Tangan Digital
+    upload_ttd = st.file_uploader("Upload Gambar Tanda Tangan Digital (Opsional - Format PNG/JPG)", type=["png", "jpg", "jpeg"])
 
     # --- GENERATE PDF ---
     if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_width=True):
@@ -323,19 +331,13 @@ if len(st.session_state.keranjang) > 0:
             
         pdf.ln(24)
         
-        # Format Penandatangan: AM (Ade Budi Susetyo) dan SPV (jika diisi)
+        # Nama Area Manager sesuai pilihan Dropdown
         pdf.set_font('Arial', 'B', 10)
-        text_penandatangan = 'Ade Budi Susetyo'
-        if nama_spv.strip() != "":
-            text_penandatangan += f' / {sanitize_text(nama_spv)}'
-            
-        pdf.cell(0, 5, text_penandatangan, 0, 1, 'L')
+        pdf.cell(0, 5, selected_am, 0, 1, 'L')
         
+        # Jabatan Miring & Lebih Kecil
         pdf.set_font('Arial', 'I', 8.5)
-        text_jabatan = 'Area Manager'
-        if nama_spv.strip() != "":
-            text_jabatan += ' & Supervisor'
-        pdf.cell(0, 4, text_jabatan, 0, 1, 'L') 
+        pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
         
         # === HALAMAN 2: LAMPIRAN ===
         if tampilkan_lampiran:
