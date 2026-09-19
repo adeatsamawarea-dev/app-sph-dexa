@@ -10,8 +10,8 @@ import qrcode
 
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
-st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Margin 4-3-3-2.5 & Spasi Longgar)")
+st.title("📄 SPH - SOLHAYS")
+
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -172,7 +172,7 @@ if len(st.session_state.keranjang) > 0:
         class PDF(FPDF):
             def header(self):
                 if os.path.exists(logo_png):
-                    # Logo agak besar (lebar 55mm), posisi X=30, Y=14
+                    # Logo agak besar (lebar 70mm), posisi X=30, Y=14
                     self.image(logo_png, 30, 14, 55)
                     # Memberikan jarak aman 4 cm (40mm) dari tepi atas untuk kop surat perusahaan
                     self.set_y(40)
