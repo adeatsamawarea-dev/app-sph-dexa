@@ -10,8 +10,8 @@ import qrcode
 
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
-st.title("📄 SPH - SOLHAYS 2026 ")
-st.subheader("Format Portrait (Dropdown AM & Tanda Tangan Digital)")
+st.title("📄 Cetak SPH - Mobile")
+st.subheader("Format Portrait (Filter AM & Single TTD)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -55,17 +55,42 @@ except Exception as e:
     st.error(f"Gagal memuat file CSV: {e}")
     st.stop()
 
-outlets = df_customer['Nama Outlet'].dropna().unique().tolist()
-produks = df_harga['Nama Produk'].dropna().unique().tolist()
-
 if 'keranjang' not in st.session_state:
     st.session_state.keranjang = []
 
-# --- ANTARMUKA APLIKASI ---
-st.markdown("### 1. Pilih Outlet / Rumah Sakit")
+# --- ANTARMUKA APLIKASI (URUTAN SESUAI PERMINTAAN) ---
+
+# 1. PILIH AREA MANAGER (AM) DI PALING ATAS
+st.markdown("### 1. Pilih Area Manager (AM)")
+pilihan_am = [
+    "Ade Budi Susetyo",
+    "Kusriyanto",
+    "Pratama Angga Budiantoro Putro"
+]
+selected_am = st.selectbox("Area Manager:", pilihan_am, label_visibility="collapsed")
+
+# Optional: Upload Tanda Tangan Digital Khusus AM
+upload_ttd = st.file_uploader(f"Upload Tanda Tangan / Paraf untuk {selected_am} (Opsional - PNG/JPG)", type=["png", "jpg", "jpeg"])
+
+st.markdown("---")
+
+# 2. PILIH OUTLET (Tersaring otomatis jika ada kolom AM di CSV, jika tidak ada tampil semua)
+st.markdown("### 2. Pilih Outlet / Rumah Sakit")
+if 'AM' in df_customer.columns:
+    df_filtered_cust = df_customer[df_customer['AM'].astype(str).str.contains(selected_am, case=False, na=False)]
+    if df_filtered_cust.empty:
+        df_filtered_cust = df_customer # Fallback jika nama tidak cocok persis
+} else:
+    df_filtered_cust = df_customer
+
+outlets = df_filtered_cust['Nama Outlet'].dropna().unique().tolist()
 selected_outlet = st.selectbox("Outlet:", outlets, label_visibility="collapsed")
 
-st.markdown("### 2. Tambah Produk ke SPH")
+st.markdown("---")
+
+# 3. TAMBAH PRODUK KE SPH
+st.markdown("### 3. Tambah Produk ke SPH")
+produks = df_harga['Nama Produk'].dropna().unique().tolist()
 selected_produk = st.selectbox("Pilih Produk Obat:", produks)
 
 prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
@@ -136,7 +161,7 @@ if len(st.session_state.keranjang) > 0:
     st.markdown("### 📋 Daftar Produk di SPH:")
     df_keranjang = pd.DataFrame(st.session_state.keranjang)
     
-    df_tampil = df_keranjang[['Nama Produk', 'Kemasan', 'Diskon', 'Harga Jadi Satuan']].copy()
+    df_tampil = df_keranjang[['Nama Produk', 'Diskon', 'Harga Jadi Satuan']].copy()
     df_tampil['Harga Jadi Satuan'] = df_tampil['Harga Jadi Satuan'].apply(lambda x: f"Rp {x:,.0f}")
     df_tampil['Diskon'] = df_tampil['Diskon'].apply(lambda x: f"{x}%")
     st.table(df_tampil)
@@ -147,20 +172,9 @@ if len(st.session_state.keranjang) > 0:
 
     st.markdown("---")
     
-    # --- PENGATURAN DOKUMEN & DROPDOWN PENANDATANGAN ---
-    st.markdown("### ⚙️ Pengaturan Dokumen & Penandatangan")
+    # --- PENGATURAN DOKUMEN ---
+    st.markdown("### ⚙️ Pengaturan Dokumen PDF")
     tampilkan_lampiran = st.checkbox("📄 Sertakan Halaman Kedua (Lampiran Detail & Website)", value=True)
-    
-    # Menu Dropdown Nama Area Manager
-    pilihan_am = [
-        "Ade Budi Susetyo",
-        "Kusriyanto",
-        "Pratama Angga Budiantoro Putro"
-    ]
-    selected_am = st.selectbox("Pilih Nama Area Manager (AM):", pilihan_am)
-    
-    # Upload Tanda Tangan Digital
-    upload_ttd = st.file_uploader("Upload Gambar Tanda Tangan Digital (Opsional - Format PNG/JPG)", type=["png", "jpg", "jpeg"])
 
     # --- GENERATE PDF ---
     if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_width=True):
@@ -316,22 +330,22 @@ if len(st.session_state.keranjang) > 0:
         pdf.ln(5) 
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
-        # --- BAGIAN TANDA TANGAN & QR CODE ---
+        # --- BAGIAN TANDA TANGAN (TIDAK DOBEL) ---
         y_qr = pdf.get_y()
         
-        # Tampilkan QR Code di sebelah kiri
-        if os.path.exists(qr_path):
-            pdf.image(qr_path, 30, y_qr + 2, 20)
-            
-        # Tampilkan Gambar TTD yang diupload (jika ada) di sebelah kanan QR Code
         if has_uploaded_ttd:
+            # Jika user upload tanda tangan, tampilkan gambar TTD di sebelah kiri
             try:
-                pdf.image(ttd_path, 55, y_qr + 4, 30) # Posisi X=55, Lebar=30mm
+                pdf.image(ttd_path, 30, y_qr + 2, 35) # Lebar 35mm
             except: pass
+        else:
+            # Jika tidak upload TTD, tampilkan QR Code verifikasi sistem
+            if os.path.exists(qr_path):
+                pdf.image(qr_path, 30, y_qr + 2, 20)
             
         pdf.ln(24)
         
-        # Nama Area Manager sesuai pilihan Dropdown
+        # Nama Area Manager sesuai pilihan Dropdown di atas
         pdf.set_font('Arial', 'B', 10)
         pdf.cell(0, 5, selected_am, 0, 1, 'L')
         
