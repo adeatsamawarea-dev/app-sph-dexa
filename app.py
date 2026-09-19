@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Stabil & Rapi)")
+st.subheader("Format Portrait (Revisi Lengkap & Profesional)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -68,7 +68,6 @@ selected_outlet = st.selectbox("Outlet:", outlets, label_visibility="collapsed")
 st.markdown("### 2. Tambah Produk ke SPH")
 selected_produk = st.selectbox("Pilih Produk Obat:", produks)
 
-# Tarik data produk
 prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
 hna_val = 0.0
 if 'HNA' in prod_data.index: hna_val = safe_float(prod_data['HNA'])
@@ -81,7 +80,6 @@ kemasan_val = prod_data.get('Kemasan', prod_data.get('Satuan', '-'))
 link_web_val = prod_data.get('Link Web', '')
 if pd.isna(link_web_val): link_web_val = ''
 
-# Info Dasar Produk
 st.info(f"ℹ️ **Info Produk:** HNA: **Rp {hna_val:,.0f}** | Kemasan: **{sanitize_text(kemasan_val)}** | Isi: **{int(isi_val)}**")
 
 # --- KALKULATOR DISKON ---
@@ -116,10 +114,14 @@ else:
     diskon_final = round(diskon_kalkulasi, 2)
     harga_jadi_final = harga_input
 
+# --- OPSI LAMPIRAN HALAMAN 2 ---
+tampilkan_lampiran = st.checkbox("Sertakan Halaman Kedua (Lampiran Detail & Website)", value=True)
+
 # --- TOMBOL TAMBAH ---
 if st.button("➕ Tambah ke SPH", use_container_width=True):
     st.session_state.keranjang.append({
         'Nama Produk': selected_produk,
+        'Komposisi': prod_data.get('Komposisi', '-'),
         'Indikasi': prod_data.get('Indikasi', '-'),
         'Kemasan': kemasan_val,
         'Isi': int(isi_val),
@@ -190,32 +192,37 @@ if len(st.session_state.keranjang) > 0:
         tgl_sekarang = datetime.datetime.now().strftime("%d %B %Y")
         pdf.set_font('Arial', '', 10)
         pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 5, f'Boyolali, {tgl_sekarang}', 0, 1, 'R')
+        pdf.cell(0, 5, f'Surakarta, {tgl_sekarang}', 0, 1, 'R')
         
         pdf.ln(3)
-        pdf.set_font('Arial', 'B', 11)
+        pdf.set_font('Arial', 'BU', 11) # B = Bold, U = Underline (Perihal digarisbawahi)
         pdf.cell(0, 5, 'Perihal : Surat Penawaran Harga', 0, 1, 'L')
         
         pdf.ln(8) 
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 5, 'Kepada Yth,', 0, 1, 'L')
         pdf.cell(0, 5, 'Kepala Farmasi', 0, 1, 'L')
-        pdf.cell(0, 5, sanitize_text(cust_data.get('Nama Outlet', '-')), 0, 1, 'L')
+        nama_outlet_str = sanitize_text(cust_data.get('Nama Outlet', '-'))
+        pdf.cell(0, 5, nama_outlet_str, 0, 1, 'L')
+        pdf.cell(0, 5, 'di Tempat', 0, 1, 'L') # Ditambahkan "di Tempat"
         
-        pdf.ln(8) 
+        pdf.ln(6) 
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 5, 'Dengan hormat,', 0, 1, 'L')
-        pdf.cell(0, 5, 'Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :', 0, 1, 'L')
+        
+        # Kalimat pembuka baru sesuai permintaan
+        kalimat_pembuka = f"Sebelumnya kami menyampaikan terimakasih kepada {nama_outlet_str} atas kepercayaan dan kerjasama yang telah terjalin dengan baik selama ini dengan PT Dexa Medica. Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :"
+        pdf.multi_cell(0, 5, kalimat_pembuka)
         pdf.ln(4)
         
-        # === TABEL HEADER ===
-        pdf.set_font('Arial', 'B', 9)
+        # === TABEL HEADER (Nama Produk, Komposisi, Kemasan, Isi, HNA, Harga Jadi) ===
+        pdf.set_font('Arial', 'B', 8.5)
         pdf.set_fill_color(235, 235, 235) 
         pdf.set_text_color(30, 30, 30)
         pdf.set_draw_color(160, 160, 160) 
         
-        col_widths = [50, 26, 10, 23, 14, 32] 
-        headers = ['Nama Produk', 'Kemasan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi\n(Sat/Terkecil)']
+        col_widths = [35, 45, 18, 9, 21, 27] # Total lebar 155mm
+        headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Jadi\n(Sat/Terkecil)']
         
         start_x = pdf.get_x()
         start_y = pdf.get_y()
@@ -236,16 +243,16 @@ if len(st.session_state.keranjang) > 0:
         pdf.ln(max_h_header)
         
         # === TABEL ISI ===
-        pdf.set_font('Arial', '', 10)
+        pdf.set_font('Arial', '', 9)
         pdf.set_text_color(0, 0, 0)
         
         for item in st.session_state.keranjang:
             row = [
                 sanitize_text(item['Nama Produk']),
+                sanitize_text(item['Komposisi']),
                 sanitize_text(item['Kemasan']),
                 str(item['Isi']),
                 f"{item['HNA']:,.0f}",
-                f"{item['Diskon']:g}%",
                 f"{item['Harga Jadi Satuan']:,.0f}"
             ]
             
@@ -255,7 +262,7 @@ if len(st.session_state.keranjang) > 0:
                 for paragraph in str(text).split('\n'):
                     w = pdf.get_string_width(paragraph)
                     lines += math.ceil(w / (col_widths[i] - 2)) if w > 0 else 1
-                h = lines * 5 
+                h = lines * 4.5 
                 if h > max_h: max_h = h
                 
             max_h = max_h + 4 
@@ -270,9 +277,9 @@ if len(st.session_state.keranjang) > 0:
                 x = pdf.get_x()
                 y = pdf.get_y()
                 pdf.rect(x, y, col_widths[i], max_h)
-                align = 'R' if i in [3, 4, 5] else 'C' if i in [1, 2] else 'L'
+                align = 'R' if i in [4, 5] else 'C' if i in [2, 3] else 'L'
                 pdf.set_xy(x, y + 2) 
-                pdf.multi_cell(col_widths[i], 5, str(row[i]), 0, align)
+                pdf.multi_cell(col_widths[i], 4.5, str(row[i]), 0, align)
                 pdf.set_xy(x + col_widths[i], start_y)
                 
             pdf.ln(max_h)
@@ -281,66 +288,70 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', '', 10)
         pdf.multi_cell(0, 5, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan ini, atas perhatian dan kerjasamanya kami ucapkan terimakasih.')
         
-        pdf.ln(8) 
+        pdf.ln(6) 
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
-        y_ttd = pdf.get_y()
+        # QR Code diletakkan DI ATAS nama penandatangan
+        y_qr = pdf.get_y()
         if os.path.exists(qr_path):
-            pdf.image(qr_path, 30, y_ttd + 2, 22)
+            pdf.image(qr_path, 30, y_qr + 2, 20)
             
-        pdf.ln(26)
+        pdf.ln(24) # Ruang untuk QR Code
         pdf.set_font('Arial', 'B', 10)
         pdf.cell(0, 5, 'Ade Budi Susetyo', 0, 1, 'L')
-        pdf.set_font('Arial', '', 10)
-        pdf.cell(0, 5, 'AM', 0, 1, 'L') 
         
-        # === HALAMAN 2: LAMPIRAN ===
-        pdf.add_page()
-        pdf.set_font('Arial', 'B', 11)
-        pdf.set_text_color(0, 86, 179)
-        pdf.cell(0, 8, 'LAMPIRAN: DETAIL PRODUK', 0, 1, 'C')
-        pdf.ln(4)
+        # Jabatan: Lebih kecil (8.5 pt) dan Miring (Italic)
+        pdf.set_font('Arial', 'I', 8.5)
+        pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
         
-        for idx, item in enumerate(st.session_state.keranjang, start=1):
-            pdf.set_font('Arial', 'B', 10)
+        # === HALAMAN 2: LAMPIRAN (JIKA DIPILIH) ===
+        if tampilkan_lampiran:
+            pdf.add_page()
+            pdf.set_font('Arial', 'B', 11)
             pdf.set_text_color(0, 86, 179)
-            pdf.cell(0, 6, f"{idx}. {sanitize_text(item['Nama Produk'])}", 0, 1, 'L')
-            
-            pdf.set_text_color(0, 0, 0)
-            pdf.set_font('Arial', 'B', 10)
-            pdf.cell(0, 5, "Indikasi:", 0, 1, 'L')
-            pdf.set_font('Arial', '', 10)
-            indikasi_bersih = sanitize_text(item['Indikasi']).replace('\n', ' ')
-            pdf.multi_cell(0, 5, indikasi_bersih)
-            pdf.ln(2)
-            
-            url_produk = item.get('Link Web', '')
-            if url_produk and url_produk != '-' and url_produk.startswith('http'):
-                pdf.set_font('Arial', 'B', 10)
-                pdf.cell(0, 5, "Informasi Lengkap (Website):", 0, 1, 'L')
-                pdf.set_font('Arial', 'U', 10)
-                pdf.set_text_color(0, 0, 255) 
-                pdf.cell(0, 5, 'Klik di sini untuk melihat brosur & detail di Web Resmi Dexa', 0, 1, 'L', link=url_produk)
-                pdf.set_text_color(0, 0, 0) 
-                pdf.ln(3)
-            
-            clean_prod_name = re.sub(r'[^\w]', '_', item['Nama Produk'])
-            brosur_file = f"brosur_{clean_prod_name}.png"
-            brosur_file_jpg = f"brosur_{clean_prod_name}.jpg"
-            
-            found_brosur = None
-            if os.path.exists(brosur_file): found_brosur = brosur_file
-            elif os.path.exists(brosur_file_jpg): found_brosur = brosur_file_jpg
-            
-            if found_brosur:
-                try:
-                    pdf.image(found_brosur, w=155) 
-                    pdf.ln(3)
-                except: pass
-            
+            pdf.cell(0, 8, 'LAMPIRAN: DETAIL PRODUK', 0, 1, 'C')
             pdf.ln(4)
-            if pdf.get_y() > 255:
-                pdf.add_page()
+            
+            for idx, item in enumerate(st.session_state.keranjang, start=1):
+                pdf.set_font('Arial', 'B', 10)
+                pdf.set_text_color(0, 86, 179)
+                pdf.cell(0, 6, f"{idx}. {sanitize_text(item['Nama Produk'])}", 0, 1, 'L')
+                
+                pdf.set_text_color(0, 0, 0)
+                pdf.set_font('Arial', 'B', 10)
+                pdf.cell(0, 5, "Indikasi:", 0, 1, 'L')
+                pdf.set_font('Arial', '', 10)
+                indikasi_bersih = sanitize_text(item['Indikasi']).replace('\n', ' ')
+                pdf.multi_cell(0, 5, indikasi_bersih)
+                pdf.ln(2)
+                
+                url_produk = item.get('Link Web', '')
+                if url_produk and url_produk != '-' and url_produk.startswith('http'):
+                    pdf.set_font('Arial', 'B', 10)
+                    pdf.cell(0, 5, "Informasi Lengkap (Website):", 0, 1, 'L')
+                    pdf.set_font('Arial', 'U', 10)
+                    pdf.set_text_color(0, 0, 255) 
+                    pdf.cell(0, 5, 'Klik di sini untuk melihat brosur & detail di Web Resmi Dexa', 0, 1, 'L', link=url_produk)
+                    pdf.set_text_color(0, 0, 0) 
+                    pdf.ln(3)
+                
+                clean_prod_name = re.sub(r'[^\w]', '_', item['Nama Produk'])
+                brosur_file = f"brosur_{clean_prod_name}.png"
+                brosur_file_jpg = f"brosur_{clean_prod_name}.jpg"
+                
+                found_brosur = None
+                if os.path.exists(brosur_file): found_brosur = brosur_file
+                elif os.path.exists(brosur_file_jpg): found_brosur = brosur_file_jpg
+                
+                if found_brosur:
+                    try:
+                        pdf.image(found_brosur, w=155) 
+                        pdf.ln(3)
+                    except: pass
+                
+                pdf.ln(4)
+                if pdf.get_y() > 255:
+                    pdf.add_page()
         
         try:
             pdf_bytes = bytes(pdf.output()) 
