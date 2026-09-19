@@ -8,10 +8,10 @@ import os
 from PIL import Image
 import qrcode
 
-st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
+st.set_page_config(page_title="SPH - Solhays 2026", page_icon="📄", layout="centered")
 
-st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Perbaikan Ukuran TTD/QR)")
+st.title("📄 SPH - Solhays 2026")
+st.subheader("Format Portrait (Tanda Tangan & Tampilan Rapi)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -69,7 +69,6 @@ pilihan_am = [
 ]
 selected_am = st.selectbox("Area Manager:", pilihan_am, label_visibility="collapsed")
 
-# Optional: Upload Tanda Tangan Digital Khusus AM
 upload_ttd = st.file_uploader(f"Upload Tanda Tangan / Paraf untuk {selected_am} (Opsional - PNG/JPG)", type=["png", "jpg", "jpeg"])
 
 st.markdown("---")
@@ -172,7 +171,6 @@ if len(st.session_state.keranjang) > 0:
 
     st.markdown("---")
     
-    # --- PENGATURAN DOKUMEN ---
     st.markdown("### ⚙️ Pengaturan Dokumen PDF")
     tampilkan_lampiran = st.checkbox("📄 Sertakan Halaman Kedua (Lampiran Detail & Website)", value=True)
 
@@ -329,27 +327,28 @@ if len(st.session_state.keranjang) > 0:
         pdf.ln(5) 
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
-        # --- BAGIAN TANDA TANGAN (UKURAN DIPERKECIL & AMAN TIDAK MENUTUPI NAMA) ---
-        y_qr = pdf.get_y()
+        # --- TANDA TANGAN / QR CODE KECIL DI KIRI, NAMA DIKANANNYA & DIGARISBAWAHI ---
+        y_ttd = pdf.get_y()
         
         if has_uploaded_ttd:
             try:
-                # Ukuran diperkecil lebar 22mm agar proporsional dan rapi
-                pdf.image(ttd_path, 30, y_qr + 2, w=22) 
+                pdf.image(ttd_path, 30, y_ttd + 2, w=22) # Gambar TTD kecil
             except: pass
         else:
             if os.path.exists(qr_path):
-                # Ukuran QR code diperkecil lebar 18mm
-                pdf.image(qr_path, 30, y_qr + 2, w=18)
+                pdf.image(qr_path, 30, y_ttd + 2, w=15) # QR code diperkecil 15mm
             
-        # Jarak turun (ln) dilebarkan agar teks nama berada di bawah gambar dengan aman
-        pdf.ln(22)
-        
-        pdf.set_font('Arial', 'B', 10)
+        # Nama Area Manager diatur di sebelah kanan gambar (X = 52) sejajar vertikal
+        pdf.set_xy(52, y_ttd + 3)
+        pdf.set_font('Arial', 'BU', 10) # B = Bold, U = Underline (Digarisbawahi)
         pdf.cell(0, 5, selected_am, 0, 1, 'L')
         
+        # Jabatan di bawahnya agak mepet
+        pdf.set_x(52)
         pdf.set_font('Arial', 'I', 8.5)
         pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
+        
+        pdf.ln(10) # Jarak ke bawah setelah blok tanda tangan
         
         # === HALAMAN 2: LAMPIRAN ===
         if tampilkan_lampiran:
