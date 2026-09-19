@@ -79,8 +79,8 @@ st.markdown("### 2. Pilih Outlet / Rumah Sakit")
 if 'AM' in df_customer.columns:
     df_filtered_cust = df_customer[df_customer['AM'].astype(str).str.contains(selected_am, case=False, na=False)]
     if df_filtered_cust.empty:
-        df_filtered_cust = df_customer # Fallback jika nama tidak cocok persis
-} else:
+        df_filtered_cust = df_customer 
+else:
     df_filtered_cust = df_customer
 
 outlets = df_filtered_cust['Nama Outlet'].dropna().unique().tolist()
@@ -195,7 +195,6 @@ if len(st.session_state.keranjang) > 0:
         img_qr = qr.make_image(fill_color="black", back_color="white")
         img_qr.save(qr_path)
         
-        # Simpan file upload TTD jika ada
         ttd_path = "ttd_upload_temp.png"
         has_uploaded_ttd = False
         if upload_ttd is not None:
@@ -334,22 +333,18 @@ if len(st.session_state.keranjang) > 0:
         y_qr = pdf.get_y()
         
         if has_uploaded_ttd:
-            # Jika user upload tanda tangan, tampilkan gambar TTD di sebelah kiri
             try:
-                pdf.image(ttd_path, 30, y_qr + 2, 35) # Lebar 35mm
+                pdf.image(ttd_path, 30, y_qr + 2, 35) 
             except: pass
         else:
-            # Jika tidak upload TTD, tampilkan QR Code verifikasi sistem
             if os.path.exists(qr_path):
                 pdf.image(qr_path, 30, y_qr + 2, 20)
             
         pdf.ln(24)
         
-        # Nama Area Manager sesuai pilihan Dropdown di atas
         pdf.set_font('Arial', 'B', 10)
         pdf.cell(0, 5, selected_am, 0, 1, 'L')
         
-        # Jabatan Miring & Lebih Kecil
         pdf.set_font('Arial', 'I', 8.5)
         pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
         
