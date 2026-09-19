@@ -1,3 +1,122 @@
+import streamlit as st
+import pandas as pd
+from fpdf import FPDF
+import datetime
+import io
+import re
+
+st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
+
+st.title("📄 Cetak SPH - Mobile")
+st.subheader("PT Dexa Medica")
+
+# Fungsi pembersih teks
+def sanitize_text(text):
+    if pd.isna(text): return "-"
+    return str(text).replace('•', '- ').encode('latin-1', 'replace').decode('latin-1')
+
+# Fungsi cerdas untuk mengatasi error format angka di CSV
+def safe_float(val):
+    if pd.isna(val): return 0.0
+    if isinstance(val, (int, float)): return float(val)
+    val_str = str(val).strip()
+    val_str = re.sub(r'[^\d,\.-]', '', val_str)
+    if '.' in val_str and ',' in val_str:
+        if val_str.rfind('.') > val_str.rfind(','):
+            val_str = val_str.replace(',', '')
+        else:
+            val_str = val_str.replace('.', '').replace(',', '.')
+    else:
+        if val_str.count('.') > 1:
+            val_str = val_str.replace('.', '')
+        elif val_str.count(',') > 1:
+            val_str = val_str.replace(',', '')
+        else:
+            if ',' in val_str:
+                parts = val_str.split(',')
+                if len(parts[1]) == 3:
+                    val_str = val_str.replace(',', '')
+                else:
+                    val_str = val_str.replace(',', '.')
+            elif '.' in val_str:
+                parts = val_str.split('.')
+                if len(parts[1]) == 3:
+                    val_str = val_str.replace('.', '')
+    try:
+        return float(val_str)
+    except:
+        return 0.0
+
+# Load Data
+@st.cache_data
+def load_data():
+    df_cust = pd.read_csv("SPH2026_Customer.csv")
+    df_prod = pd.read_csv("SPH2026_Master_Obat.csv")
+    df_cust.columns = df_cust.columns.str.strip()
+    df_prod.columns = df_prod.columns.str.strip()
+    return df_cust, df_prod
+
+try:
+    df_customer, df_harga = load_data()
+except Exception as e:
+    st.error(f"Gagal memuat file CSV: {e}")
+    st.stop()
+
+outlets = df_customer['Nama Outlet'].dropna().unique().tolist()
+produks = df_harga['Nama Produk'].dropna().unique().tolist()
+
+# ---- INISIALISASI KERANJANG ----
+if 'keranjang' not in st.session_state:
+    st.session_state.keranjang = []
+
+# ---- FORM INPUT ----
+st.markdown("### 1. Pilih Outlet / Rumah Sakit")
+selected_outlet = st.selectbox("Outlet:", outlets, label_visibility="collapsed")
+
+st.markdown("### 2. Tambah Produk ke SPH")
+col1, col2 = st.columns([2, 1])
+with col1:
+    selected_produk = st.selectbox("Pilih Produk Obat:", produks)
+with col2:
+    # Diskon disesuaikan agar menerima input desimal (koma)
+    diskon = st.number_input("Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
+
+if st.button("➕ Tambah ke SPH", use_container_width=True):
+    prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
+    
+    hna_val = 0.0
+    if 'HNA' in prod_data.index: 
+        hna_val = safe_float(prod_data['HNA'])
+    elif 'Harga Hna' in prod_data.index: 
+        hna_val = safe_float(prod_data['Harga Hna'])
+        
+    # Penambahan fungsi round() untuk akurasi presisi desimal
+    harga_jadi = round(hna_val - (hna_val * diskon / 100))
+    
+    st.session_state.keranjang.append({
+        'Nama Produk': selected_produk,
+        'Kemasan': prod_data.get('Kemasan', '-'),
+        'HNA': hna_val,
+        'Diskon': diskon,
+        'Harga Jadi': harga_jadi,
+        'Indikasi': prod_data.get('Indikasi', '-')
+    })
+    st.success(f"Berhasil menambahkan {selected_produk}! (Gulir ke bawah)")
+
+# ---- TAMPILKAN KERANJANG ----
+if len(st.session_state.keranjang) > 0:
+    st.markdown("### 📋 Daftar Produk di SPH ini:")
+    df_keranjang = pd.DataFrame(st.session_state.keranjang)
+    
+    df_tampil = df_keranjang[['Nama Produk', 'Kemasan', 'Diskon', 'Harga Jadi']].copy()
+    df_tampil['Harga Jadi'] = df_tampil['Harga Jadi'].apply(lambda x: f"Rp {x:,.0f}")
+    df_tampil['Diskon'] = df_tampil['Diskon'].apply(lambda x: f"{x:g}%")
+    st.table(df_tampil)
+    
+    if st.button("🗑️ Hapus Semua Produk", type="secondary"):
+        st.session_state.keranjang = []
+        st.rerun()
+
 # ---- TOMBOL GENERATE PDF ----
 st.markdown("---")
 if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_width=True):
@@ -5,19 +124,17 @@ if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_w
     
     class PDF(FPDF):
         def header(self):
-            # Desain Kop Surat Modern
             self.set_font('Arial', 'B', 16)
-            self.set_text_color(220, 20, 60) # Merah Dexa
+            self.set_text_color(220, 20, 60)
             self.cell(0, 8, 'PT DEXA MEDICA', 0, 1, 'L')
             
             self.set_font('Arial', 'I', 9)
             self.set_text_color(100, 100, 100)
             self.cell(0, 5, 'Expertise for the Promotion of Health', 0, 1, 'L')
             
-            # Garis pemisah kop surat
             self.set_draw_color(220, 20, 60)
             self.set_line_width(0.8)
-            self.line(20, 25, 190, 25) # Menyesuaikan margin kiri 20mm
+            self.line(20, 25, 190, 25)
             self.set_line_width(0.2)
             self.line(20, 26, 190, 26)
             self.ln(10)
@@ -30,7 +147,6 @@ if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_w
 
     pdf = PDF()
     
-    # 5. Margin kiri dibuat 2 cm (20 mm), atas 15 mm, kanan 15 mm
     pdf.set_margins(left=20, top=15, right=15)
     pdf.add_page()
     
@@ -38,7 +154,6 @@ if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_w
     pdf.set_font('Arial', '', 10)
     pdf.set_text_color(0, 0, 0)
     
-    # 1. Boyolali diganti Surakarta
     pdf.cell(0, 8, f'Surakarta, {tgl_sekarang}', 0, 1, 'R')
     
     pdf.set_font('Arial', '', 10)
@@ -50,7 +165,6 @@ if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_w
     pdf.cell(0, 5, sanitize_text(cust_data.get('Direktur', '-')), 0, 1)
     pdf.cell(0, 5, sanitize_text(cust_data.get('Nama Outlet', '-')), 0, 1)
     
-    # 2. Bawah nama outlet ditambahi "di Tempat"
     pdf.set_font('Arial', '', 10)
     pdf.cell(0, 5, 'di Tempat', 0, 1)
     pdf.ln(5)
@@ -59,7 +173,6 @@ if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_w
     pdf.multi_cell(0, 5, 'Semoga Bapak/Ibu dalam keadaan sehat dan sukses selalu. Bersama surat ini, kami dari PT Dexa Medica bermaksud menyampaikan penawaran harga khusus untuk produk kami sebagai berikut:')
     pdf.ln(5)
     
-    # Header Tabel - Desain Modern (Header Merah, Teks Putih)
     pdf.set_font('Arial', 'B', 9)
     pdf.set_fill_color(220, 20, 60) 
     pdf.set_text_color(255, 255, 255) 
@@ -71,12 +184,11 @@ if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_w
     pdf.cell(15, 8, 'Disc', 1, 0, 'C', 1)
     pdf.cell(45, 8, 'Harga Jadi (Rp)', 1, 1, 'C', 1)
     
-    # Isi Tabel - Zebra Stripes (Belang-belang)
     pdf.set_font('Arial', '', 9)
     pdf.set_text_color(0, 0, 0)
     
     fill = False
-    pdf.set_fill_color(245, 245, 245) # Warna abu-abu terang untuk baris tabel
+    pdf.set_fill_color(245, 245, 245)
     
     for item in st.session_state.keranjang:
         nama = sanitize_text(item['Nama Produk'])[:30]
@@ -90,10 +202,8 @@ if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_w
         pdf.cell(45, 8, f"{item['Harga Jadi']:,.0f}", 1, 1, 'R', fill)
         pdf.set_font('Arial', '', 9)
         
-        fill = not fill # Ganti warna latar untuk baris berikutnya
+        fill = not fill 
         
-    # 3. Halaman Indikasi (Lampiran Hal 2) Dihapus total dari kode
-    
     pdf.ln(5)
     pdf.set_font('Arial', '', 10)
     pdf.multi_cell(0, 5, f'Besar harapan kami agar penawaran ini dapat menjadi langkah awal dari kerjasama yang baik antara PT Dexa Medica dengan {sanitize_text(cust_data.get("Nama Outlet", "-"))}.')
@@ -101,16 +211,13 @@ if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_w
     
     pdf.cell(0, 6, 'Hormat kami,', 0, 1)
     
-    # 4. Sisipkan file qr-code.png sebagai ganti tanda tangan teks
     x_pos = pdf.get_x()
     y_pos = pdf.get_y()
     
     try:
-        # Menyisipkan gambar QR Code (lebar 25 mm). Pastikan file bernama persis qr-code.png
         pdf.image('qr-code.png', x=x_pos, y=y_pos + 2, w=25)
-        pdf.ln(30) # Beri ruang vertikal agar teks di bawahnya tidak tertindih QR
+        pdf.ln(30)
     except Exception as e:
-        # Jika file qr-code.png tidak ditemukan/error, beri jarak kosong standar
         pdf.ln(20) 
         
     pdf.set_font('Arial', 'B', 10)
