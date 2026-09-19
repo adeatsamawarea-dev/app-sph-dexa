@@ -210,21 +210,20 @@ if len(st.session_state.keranjang) > 0:
         pdf.ln(5); pdf.set_font('Arial', '', 10); pdf.multi_cell(0, 6, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan ini, atas perhatian dan kerjasamanya kami ucapkan terima kasih.'); pdf.ln(4); pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
 
         y_ttd = pdf.get_y() + 2
-        qr_w = 38
-        qr_x = 30 + (pdf.w - 60 - qr_w) / 2
-        if has_uploaded_ttd:
-            try:
-                pdf.image(ttd_path, qr_x, y_ttd, w=qr_w)
-                y_next = y_ttd + qr_w + 4
-            except:
-                y_next = y_ttd + 2
-        else:
-            if os.path.exists(qr_path):
-                pdf.image(qr_path, qr_x, y_ttd, w=qr_w)
-                y_next = y_ttd + qr_w + 4
-            else:
-                y_next = y_ttd + 2
-
+qr_w = 38
+qr_x = 30   # rata kiri
+if has_uploaded_ttd:
+    try:
+        pdf.image(ttd_path, qr_x, y_ttd, w=qr_w)
+        y_next = y_ttd + qr_w + 4
+    except:
+        y_next = y_ttd + 2
+else:
+    if os.path.exists(qr_path):
+        pdf.image(qr_path, qr_x, y_ttd, w=qr_w)
+        y_next = y_ttd + qr_w + 4
+    else:
+        y_next = y_ttd + 2
         pdf.set_xy(30, y_next)
         pdf.set_font('Arial', 'B', 12)
         pdf.cell(0, 6, selected_am, 0, 1, 'C')
