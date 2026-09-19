@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Fixed Checkbox & Master Update)")
+st.subheader("Format Portrait (Margin 4-3-3-2.5 & Spasi Longgar)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -41,7 +41,6 @@ def safe_float(val):
     try: return float(val_str)
     except: return 0.0
 
-# Menggunakan st.cache_data(ttl=0) agar setiap perubahan di CSV langsung terbaca tanpa nyangkut di memori
 @st.cache_data(ttl=0)
 def load_data():
     df_cust = pd.read_csv("SPH2026_Customer.csv")
@@ -77,7 +76,6 @@ elif 'Harga Hna' in prod_data.index: hna_val = safe_float(prod_data['Harga Hna']
 isi_val = safe_float(prod_data.get('Isi', 1))
 if isi_val <= 0: isi_val = 1
 
-# Membaca kolom Kemasan / Satuan dari Master Obat yang baru di-update
 kemasan_val = prod_data.get('Kemasan', prod_data.get('Satuan', '-'))
 if pd.isna(kemasan_val) or str(kemasan_val).strip() == '':
     kemasan_val = prod_data.get('Satuan', '-')
@@ -149,7 +147,6 @@ if len(st.session_state.keranjang) > 0:
 
     st.markdown("---")
     
-    # --- OPSI LAMPIRAN HALAMAN 2 (Checkbox Jelas) ---
     st.markdown("### ⚙️ Pengaturan Dokumen PDF")
     tampilkan_lampiran = st.checkbox("📄 Sertakan Halaman Kedua (Lampiran Detail & Website)", value=True)
 
@@ -175,24 +172,28 @@ if len(st.session_state.keranjang) > 0:
         class PDF(FPDF):
             def header(self):
                 if os.path.exists(logo_png):
-                    self.image(logo_png, 30, 12, 45)
-                    self.set_y(30)
+                    # Logo agak besar (lebar 55mm), posisi X=30, Y=14
+                    self.image(logo_png, 30, 14, 55)
+                    # Memberikan jarak aman 4 cm (40mm) dari tepi atas untuk kop surat perusahaan
+                    self.set_y(40)
                 else:
-                    self.set_y(30)
+                    self.set_y(40)
                     self.set_font('Arial', 'B', 15)
                     self.set_text_color(0, 86, 179)
                     self.cell(0, 8, 'PT DEXA MEDICA', 0, 1, 'L')
                     self.ln(5)
                 
             def footer(self):
-                self.set_y(-25)
+                # Margin bawah 3 cm (-30)
+                self.set_y(-30)
                 self.set_font('Arial', 'I', 8)
                 self.set_text_color(128)
                 self.cell(0, 10, f'Halaman {self.page_no()}', 0, 0, 'C')
 
         # === HALAMAN 1: SURAT UTAMA ===
         pdf = PDF('P', 'mm', 'A4')
-        pdf.set_margins(30, 30, 25)
+        # Setting margin sesuai permintaan: Kiri=3 cm (30), Atas=4 cm (40), Kanan=2.5 cm (25), Bawah=3 cm (30)
+        pdf.set_margins(30, 40, 25)
         pdf.add_page()
         
         tgl_sekarang = datetime.datetime.now().strftime("%d %B %Y")
@@ -201,10 +202,10 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, f'Surakarta, {tgl_sekarang}', 0, 1, 'R')
         
         pdf.ln(3)
-        pdf.set_font('Arial', 'BU', 11) # Perihal digarisbawahi
+        pdf.set_font('Arial', 'BU', 11) 
         pdf.cell(0, 5, 'Perihal : Surat Penawaran Harga', 0, 1, 'L')
         
-        pdf.ln(8) 
+        pdf.ln(6) 
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 5, 'Kepada Yth,', 0, 1, 'L')
         pdf.cell(0, 5, 'Kepala Farmasi', 0, 1, 'L')
@@ -212,12 +213,13 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, nama_outlet_str, 0, 1, 'L')
         pdf.cell(0, 5, 'di Tempat', 0, 1, 'L')
         
-        pdf.ln(6) 
+        pdf.ln(5) 
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 5, 'Dengan hormat,', 0, 1, 'L')
         
         kalimat_pembuka = f"Sebelumnya kami menyampaikan terimakasih kepada {nama_outlet_str} atas kepercayaan dan kerjasama yang telah terjalin dengan baik selama ini dengan PT Dexa Medica . Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :"
-        pdf.multi_cell(0, 5, kalimat_pembuka)
+        # Spasi baris paragraf diatur longgar (6 mm)
+        pdf.multi_cell(0, 6, kalimat_pembuka)
         pdf.ln(4)
         
         # === TABEL HEADER ===
@@ -226,6 +228,7 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_text_color(30, 30, 30)
         pdf.set_draw_color(160, 160, 160) 
         
+        # Lebar Total 155mm (210 - 30 kiri - 25 kanan)
         col_widths = [35, 45, 18, 9, 21, 27] 
         headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Jadi\n(Sat/Terkecil)']
         
@@ -247,8 +250,8 @@ if len(st.session_state.keranjang) > 0:
             
         pdf.ln(max_h_header)
         
-        # === TABEL ISI ===
-        pdf.set_font('Arial', '', 9)
+        # === TABEL ISI (Spasi longgar 1.15 - 1.5 agar mudah dibaca) ===
+        pdf.set_font('Arial', '', 9.5)
         pdf.set_text_color(0, 0, 0)
         
         for item in st.session_state.keranjang:
@@ -261,20 +264,21 @@ if len(st.session_state.keranjang) > 0:
                 f"{item['Harga Jadi Satuan']:,.0f}"
             ]
             
-            max_h = 6
+            max_h = 7
             for i, text in enumerate(row):
                 lines = 0
                 for paragraph in str(text).split('\n'):
                     w = pdf.get_string_width(paragraph)
                     lines += math.ceil(w / (col_widths[i] - 2)) if w > 0 else 1
-                h = lines * 4.5 
+                # Spasi baris antar teks diperbesar (6 pt) setara line spacing longgar
+                h = lines * 6 
                 if h > max_h: max_h = h
                 
-            max_h = max_h + 4 
+            max_h = max_h + 5 # Padding sel vertikal longgar
             start_x = pdf.get_x()
             start_y = pdf.get_y()
             
-            if start_y + max_h > 265: 
+            if start_y + max_h > 260: 
                 pdf.add_page()
                 start_y = pdf.get_y()
                 
@@ -283,17 +287,17 @@ if len(st.session_state.keranjang) > 0:
                 y = pdf.get_y()
                 pdf.rect(x, y, col_widths[i], max_h)
                 align = 'R' if i in [4, 5] else 'C' if i in [2, 3] else 'L'
-                pdf.set_xy(x, y + 2) 
-                pdf.multi_cell(col_widths[i], 4.5, str(row[i]), 0, align)
+                pdf.set_xy(x, y + 2.5) # Posisi teks ditengahkan secara vertikal dengan longgar
+                pdf.multi_cell(col_widths[i], 5.5, str(row[i]), 0, align)
                 pdf.set_xy(x + col_widths[i], start_y)
                 
             pdf.ln(max_h)
             
-        pdf.ln(6)
+        pdf.ln(5)
         pdf.set_font('Arial', '', 10)
-        pdf.multi_cell(0, 5, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan ini, atas perhatian dan kerjasamanya kami ucapkan terimakasih.')
+        pdf.multi_cell(0, 6, 'Kami berharap produk PT. Dexa Medica ini dapat menjadi standard di Rumah Sakit yang Bapak/Ibu pimpin. Demikian surat permohonan ini, atas perhatian dan kerjasamanya kami ucapkan terimakasih.')
         
-        pdf.ln(6) 
+        pdf.ln(5) 
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
         y_qr = pdf.get_y()
@@ -307,7 +311,7 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', 'I', 8.5)
         pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
         
-        # === HALAMAN 2: LAMPIRAN (Hanya dicetak jika Checkbox dicentang) ===
+        # === HALAMAN 2: LAMPIRAN ===
         if tampilkan_lampiran:
             pdf.add_page()
             pdf.set_font('Arial', 'B', 11)
@@ -325,7 +329,7 @@ if len(st.session_state.keranjang) > 0:
                 pdf.cell(0, 5, "Indikasi:", 0, 1, 'L')
                 pdf.set_font('Arial', '', 10)
                 indikasi_bersih = sanitize_text(item['Indikasi']).replace('\n', ' ')
-                pdf.multi_cell(0, 5, indikasi_bersih)
+                pdf.multi_cell(0, 6, indikasi_bersih)
                 pdf.ln(2)
                 
                 url_produk = item.get('Link Web', '')
