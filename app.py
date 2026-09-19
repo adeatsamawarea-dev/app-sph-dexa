@@ -10,8 +10,8 @@ import qrcode
 
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
-st.title("📄 SPH - SOLHAYS")
-
+st.title("📄 Cetak SPH - Mobile")
+st.subheader("Format Portrait (Tambah Nama SPV & Upload TTD)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -147,8 +147,12 @@ if len(st.session_state.keranjang) > 0:
 
     st.markdown("---")
     
-    st.markdown("### ⚙️ Pengaturan Dokumen PDF")
+    # --- PENGATURAN DOKUMEN & TANDA TANGAN ---
+    st.markdown("### ⚙️ Pengaturan Dokumen & Penandatangan")
     tampilkan_lampiran = st.checkbox("📄 Sertakan Halaman Kedua (Lampiran Detail & Website)", value=True)
+    
+    nama_spv = st.text_input("Nama SPV (Supervisor) — *Kosongkan jika tidak ada*", value="")
+    upload_ttd = st.file_uploader("Upload Tanda Tangan Digital (Opsional - Format PNG/JPG)", type=["png", "jpg", "jpeg"])
 
     # --- GENERATE PDF ---
     if st.button("📄 Generate & Download PDF SPH", type="primary", use_container_width=True):
@@ -169,12 +173,21 @@ if len(st.session_state.keranjang) > 0:
         img_qr = qr.make_image(fill_color="black", back_color="white")
         img_qr.save(qr_path)
         
+        # Simpan file upload TTD jika ada
+        ttd_path = "ttd_upload_temp.png"
+        has_uploaded_ttd = False
+        if upload_ttd is not None:
+            try:
+                img_ttd = Image.open(upload_ttd)
+                img_ttd.save(ttd_path, "PNG")
+                has_uploaded_ttd = True
+            except:
+                pass
+
         class PDF(FPDF):
             def header(self):
                 if os.path.exists(logo_png):
-                    # Logo agak besar (lebar 70mm), posisi X=30, Y=14
                     self.image(logo_png, 30, 14, 55)
-                    # Memberikan jarak aman 4 cm (40mm) dari tepi atas untuk kop surat perusahaan
                     self.set_y(40)
                 else:
                     self.set_y(40)
@@ -184,7 +197,6 @@ if len(st.session_state.keranjang) > 0:
                     self.ln(5)
                 
             def footer(self):
-                # Margin bawah 3 cm (-30)
                 self.set_y(-30)
                 self.set_font('Arial', 'I', 8)
                 self.set_text_color(128)
@@ -192,7 +204,6 @@ if len(st.session_state.keranjang) > 0:
 
         # === HALAMAN 1: SURAT UTAMA ===
         pdf = PDF('P', 'mm', 'A4')
-        # Setting margin sesuai permintaan: Kiri=3 cm (30), Atas=4 cm (40), Kanan=2.5 cm (25), Bawah=3 cm (30)
         pdf.set_margins(30, 40, 25)
         pdf.add_page()
         
@@ -218,7 +229,6 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, 'Dengan hormat,', 0, 1, 'L')
         
         kalimat_pembuka = f"Sebelumnya kami menyampaikan terimakasih kepada {nama_outlet_str} atas kepercayaan dan kerjasama yang telah terjalin dengan baik selama ini dengan PT Dexa Medica . Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :"
-        # Spasi baris paragraf diatur longgar (6 mm)
         pdf.multi_cell(0, 6, kalimat_pembuka)
         pdf.ln(4)
         
@@ -228,7 +238,6 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_text_color(30, 30, 30)
         pdf.set_draw_color(160, 160, 160) 
         
-        # Lebar Total 155mm (210 - 30 kiri - 25 kanan)
         col_widths = [35, 45, 18, 9, 21, 27] 
         headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Jadi\n(Sat/Terkecil)']
         
@@ -250,7 +259,7 @@ if len(st.session_state.keranjang) > 0:
             
         pdf.ln(max_h_header)
         
-        # === TABEL ISI (Spasi longgar 1.15 - 1.5 agar mudah dibaca) ===
+        # === TABEL ISI ===
         pdf.set_font('Arial', '', 9.5)
         pdf.set_text_color(0, 0, 0)
         
@@ -270,11 +279,10 @@ if len(st.session_state.keranjang) > 0:
                 for paragraph in str(text).split('\n'):
                     w = pdf.get_string_width(paragraph)
                     lines += math.ceil(w / (col_widths[i] - 2)) if w > 0 else 1
-                # Spasi baris antar teks diperbesar (6 pt) setara line spacing longgar
                 h = lines * 6 
                 if h > max_h: max_h = h
                 
-            max_h = max_h + 5 # Padding sel vertikal longgar
+            max_h = max_h + 5 
             start_x = pdf.get_x()
             start_y = pdf.get_y()
             
@@ -287,7 +295,7 @@ if len(st.session_state.keranjang) > 0:
                 y = pdf.get_y()
                 pdf.rect(x, y, col_widths[i], max_h)
                 align = 'R' if i in [4, 5] else 'C' if i in [2, 3] else 'L'
-                pdf.set_xy(x, y + 2.5) # Posisi teks ditengahkan secara vertikal dengan longgar
+                pdf.set_xy(x, y + 2.5) 
                 pdf.multi_cell(col_widths[i], 5.5, str(row[i]), 0, align)
                 pdf.set_xy(x + col_widths[i], start_y)
                 
@@ -300,16 +308,34 @@ if len(st.session_state.keranjang) > 0:
         pdf.ln(5) 
         pdf.cell(0, 5, 'Salam,', 0, 1, 'L')
         
+        # --- BAGIAN TANDA TANGAN & QR CODE ---
         y_qr = pdf.get_y()
+        
+        # Tampilkan QR Code di sebelah kiri
         if os.path.exists(qr_path):
             pdf.image(qr_path, 30, y_qr + 2, 20)
             
+        # Tampilkan Gambar TTD yang diupload (jika ada) di sebelah kanan QR Code
+        if has_uploaded_ttd:
+            try:
+                pdf.image(ttd_path, 55, y_qr + 4, 30) # Posisi X=55, Lebar=30mm
+            except: pass
+            
         pdf.ln(24)
+        
+        # Format Penandatangan: AM (Ade Budi Susetyo) dan SPV (jika diisi)
         pdf.set_font('Arial', 'B', 10)
-        pdf.cell(0, 5, 'Ade Budi Susetyo', 0, 1, 'L')
+        text_penandatangan = 'Ade Budi Susetyo'
+        if nama_spv.strip() != "":
+            text_penandatangan += f' / {sanitize_text(nama_spv)}'
+            
+        pdf.cell(0, 5, text_penandatangan, 0, 1, 'L')
         
         pdf.set_font('Arial', 'I', 8.5)
-        pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
+        text_jabatan = 'Area Manager'
+        if nama_spv.strip() != "":
+            text_jabatan += ' & Supervisor'
+        pdf.cell(0, 4, text_jabatan, 0, 1, 'L') 
         
         # === HALAMAN 2: LAMPIRAN ===
         if tampilkan_lampiran:
@@ -367,6 +393,7 @@ if len(st.session_state.keranjang) > 0:
         
         if os.path.exists(logo_png): os.remove(logo_png)
         if os.path.exists(qr_path): os.remove(qr_path)
+        if has_uploaded_ttd and os.path.exists(ttd_path): os.remove(ttd_path)
         
         st.success("✅ SPH Berhasil Dibuat!")
         st.download_button(
