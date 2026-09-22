@@ -192,7 +192,7 @@ if len(st.session_state.keranjang) > 0:
 
         # === HALAMAN 1: SURAT UTAMA ===
         pdf = PDF('P', 'mm', 'A4')
-        pdf.set_margins(30, 30, 25)
+        pdf.set_margins(25, 30, 25)
         pdf.add_page()
         
         tgl_sekarang = datetime.datetime.now().strftime("%d %B %Y")
@@ -227,7 +227,7 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_draw_color(160, 160, 160) 
         
         col_widths = [35, 55, 16, 8, 20, 24] 
-        headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Per Unit)']
+        headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Per Unit']
         
         start_x = pdf.get_x()
         start_y = pdf.get_y()
