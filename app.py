@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 
 st.set_page_config(
-    page_title="SPH SOLHAYS 2026 + Preview Diskon",
+    page_title="SPH SOLHAYS 2026",
     page_icon="📄",
-    layout="wide"
+    layout="centered"  # Menggunakan layout centered agar interface lebih sempit & rapi (tidak terlalu lebar)
 )
 
 # ==========================================
@@ -37,17 +37,16 @@ def fetch_history_diskon():
         return pd.DataFrame()
 
 # ==========================================
-# 2. MASTER DATA & KAMUS PEMETAAN OUTLET SPH -> SOLHAYS02
+# 2. MASTER DATA & KAMUS PEMETAAN OUTLET
 # ==========================================
 MASTER_PRODUK = {
-    "ALBAPURE 20% 100ML": {"hna": 1650000, "kemasan": "Botol", "isi": 1},
-    "DOFEN INJ 400MG": {"hna": 300000, "kemasan": "Ampul", "isi": 5},
-    "INBUMIN FC TAB": {"hna": 195000, "kemasan": "Box", "isi": 30},
-    "LEVICA 4ML": {"hna": 450000, "kemasan": "Vial", "isi": 1},
-    "REPACOR": {"hna": 125000, "kemasan": "Box", "isi": 10}
+    "ALBAPURE 20% 100ML": {"hna": 1650000.00, "kemasan": "Botol", "isi": 1},
+    "DOFEN INJ 400MG": {"hna": 300000.00, "kemasan": "Ampul", "isi": 5},
+    "INBUMIN FC TAB": {"hna": 195000.00, "kemasan": "Box", "isi": 30},
+    "LEVICA 4ML": {"hna": 450000.00, "kemasan": "Vial", "isi": 1},
+    "REPACOR": {"hna": 125000.00, "kemasan": "Box", "isi": 10}
 }
 
-# Kamus untuk menjembatani nama outlet standar SPH ke kata kunci database SOLHAYS02
 OUTLET_MAPPING_SPH = {
     "RSUD Ir. Soekarno Sukoharjo": "SOEKARNO",
     "RS Kustati Surakarta": "KUSTATI",
@@ -58,15 +57,15 @@ OUTLET_MAPPING_SPH = {
 }
 
 # ==========================================
-# 3. TAMPILAN UTAMA SPH
+# 3. TAMPILAN UTAMA SPH (COMPACT LAYOUT)
 # ==========================================
-st.title("📄 SPH / solhays_2026")
-st.markdown("### Format SPH dengan Live Preview History Diskon (SOLHAYS02)")
+st.markdown("### 📄 SPH / solhays_2026")
+st.caption("Format Portrait dengan Live Preview History Diskon")
 st.divider()
 
 df_history = fetch_history_diskon()
 
-# --- 1. PILIH OUTLET (MENGGUNAKAN FORMAT STANDARD SPH) ---
+# --- 1. PILIH OUTLET ---
 st.markdown("#### 1. Pilih Outlet / Rumah Sakit")
 list_sph_rs = list(OUTLET_MAPPING_SPH.keys())
 selected_rs = st.selectbox("Outlet Tujuan", list_sph_rs, label_visibility="collapsed")
@@ -76,76 +75,66 @@ st.divider()
 # --- 2. TAMBAH PRODUK KE SPH ---
 st.markdown("#### 2. Tambah Produk ke SPH")
 product_options = list(MASTER_PRODUK.keys())
-selected_prod = st.selectbox("Pilih Produk Obat:", product_options)
+selected_prod = st.selectbox("Pilih Produk Obat:", product_options, label_visibility="collapsed")
 
 if selected_prod in MASTER_PRODUK:
     prod_info = MASTER_PRODUK[selected_prod]
-    st.info(f"ℹ️ Info Produk: HNA: Rp {prod_info['hna']:,.0f} | Kemasan: {prod_info['kemasan']} | Isi: {prod_info['isi']}")
+    st.info(f"ℹ️ HNA: Rp {prod_info['hna']:,.2f} | Kemasan: {prod_info['kemasan']} | Isi: {prod_info['isi']}")
 
 st.divider()
 
 # ==========================================
-# 4. LIVE PREVIEW HISTORY DISKON (MENGGUNAKAN KATA KUNCI PEMETAAN)
+# 4. LIVE PREVIEW HISTORY DISKON (TANPA RATA-RATA)
 # ==========================================
-st.markdown("#### 🔍 Preview History Diskon (SOLHAYS02 App)")
+st.markdown("#### 🔍 Preview History Diskon (SOLHAYS02)")
 
 if not df_history.empty:
-    # Ambil kata kunci pemetaan berdasarkan pilihan SPH, fallback ke nama aslinya jika tidak ada di kamus
     keyword_query = OUTLET_MAPPING_SPH.get(selected_rs, selected_rs)
 
-    # Filter pencocokan data history di SOLHAYS02
     match_hist = df_history[
         (df_history['customer'].str.contains(keyword_query, case=False, na=False)) & 
         (df_history['product'].str.contains(selected_prod, case=False, na=False))
     ]
     
     if not match_hist.empty:
-        avg_hist_disc = match_hist['Disc_GJ'].mean()
-        max_hist_disc = match_hist['Disc_GJ'].max()
-        min_hist_disc = match_hist['Disc_GJ'].min()
+        st.success(f"✅ Ditemukan riwayat transaksi untuk **{selected_prod}** di **{selected_rs}**:")
         
-        st.success(f"✅ Ditemukan riwayat transaksi untuk produk ini di **{selected_rs}**!")
+        # Tampilkan tabel detail history langsung (tanpa metrik rata-rata)
+        display_hist = match_hist[['Periode', 'Invoice', 'Unit', 'valuesales', 'DAF', 'Disc_GJ', 'Name']].copy()
+        display_hist['valuesales'] = display_hist['valuesales'].map('{:,.2f}'.format)
+        display_hist['DAF'] = display_hist['DAF'].map('{:,.2f}'.format)
+        display_hist['Disc_GJ'] = display_hist['Disc_GJ'].map('{:.2f}%'.format)
         
-        h1, h2, h3 = st.columns(3)
-        h1.metric("📉 Rata-rata Diskon (G/J)", f"{avg_hist_disc:.2f}%")
-        h2.metric("🔺 Diskon Tertinggi", f"{max_hist_disc:.2f}%")
-        h3.metric("🔻 Diskon Terendah", f"{min_hist_disc:.2f}%")
-        
-        with st.expander("📂 Lihat Detail Faktur & History Sebelumnya"):
-            st.dataframe(
-                match_hist[['customer', 'Periode', 'Invoice', 'Unit', 'valuesales', 'DAF', 'Disc_GJ', 'Name']],
-                use_container_width=True
-            )
+        st.dataframe(display_hist, use_container_width=True, height=180)
     else:
-        st.warning(f"⚠️ Belum ada catatan history diskon untuk produk **{selected_prod}** di **{selected_rs}**. Pastikan menggunakan acuan standar penawaran.")
+        st.warning(f"⚠️ Belum ada history untuk produk ini di outlet tersebut.")
 else:
-    st.caption("Menghubungkan database history diskon SOLHAYS02...")
+    st.caption("Menghubungkan database history...")
 
 st.divider()
 
 # ==========================================
-# 5. MODE PERHITUNGAN HARGA & SPH
+# 5. MODE PERHITUNGAN HARGA (INPUT ANGKA SEBELUMNYA)
 # ==========================================
 st.markdown("#### Mode Perhitungan Harga:")
 calc_mode = st.radio("Pilih Mode:", ["Input Diskon (%)", "Input Target Harga Jadi"], horizontal=True, label_visibility="collapsed")
 
-target_harga = 0
-input_disc_pct = 0
+target_harga = 0.0
+hna_prod = MASTER_PRODUK.get(selected_prod, {}).get("hna", 0.0)
 
 if calc_mode == "Input Target Harga Jadi":
-    target_harga = st.number_input("Target Harga Jadi (Rp)", min_value=0.0, value=985000.0, step=1000.0)
-    hna_prod = MASTER_PRODUK.get(selected_prod, {}).get("hna", 1)
-    auto_disc = ((hna_prod - target_harga) / hna_prod * 100) if hna_prod > 0 else 0
-    if auto_disc < 0: auto_disc = 0
+    target_harga = st.number_input("Target Harga Jadi (Rp)", min_value=0.0, value=985000.00, step=1000.00, format="%.2f")
+    auto_disc = ((hna_prod - target_harga) / hna_prod * 100) if hna_prod > 0 else 0.0
+    if auto_disc < 0: auto_disc = 0.0
+    
     st.success(f"💡 **Diskon Otomatis Terhitung:**\n### **{auto_disc:.2f}%**")
 else:
-    input_disc_pct = st.slider("Masukkan Diskon (%)", 0.0, 100.0, 20.0, 0.5)
-    hna_prod = MASTER_PRODUK.get(selected_prod, {}).get("hna", 0)
-    target_harga = hna_prod - (hna_prod * input_disc_pct / 100)
-    st.info(f"💰 **Harga Hasil Penawaran:** Rp {target_harga:,.0f}")
+    input_disc_pct = st.number_input("Masukkan Diskon (%)", min_value=0.0, max_value=100.0, value=20.00, step=0.50, format="%.2f")
+    target_harga = hna_prod - (hna_prod * input_disc_pct / 100.0)
+    st.info(f"💰 **Harga Hasil Penawaran:** Rp {target_harga:,.2f}")
 
 st.divider()
 
-if st.button("💾 Simpan & Cetak Dokumen SPH", type="primary"):
+if st.button("💾 Simpan & Cetak Dokumen SPH", type="primary", use_container_width=True):
     st.balloons()
-    st.success(f"Dokumen SPH untuk **{selected_rs}** produk **{selected_prod}** berhasil diproses!")
+    st.success(f"Dokumen SPH untuk **{selected_rs}** berhasil diproses!")
