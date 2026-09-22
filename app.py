@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Tabel Rapi & Modern)")
+st.subheader("Format Portrait (Tabel Rapi & Input Diskon Aktif)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -65,11 +65,12 @@ if 'keranjang' not in st.session_state:
 st.markdown("### 1. Pilih Outlet / Rumah Sakit")
 selected_outlet = st.selectbox("Outlet:", outlets, label_visibility="collapsed")
 
-st.markdown("### 2. Tambah Produk ke SPH")
+st.markdown("### 2. Tambah Produk ke SPH & Input Diskon")
 col1, col2 = st.columns([2, 1])
 with col1:
     selected_produk = st.selectbox("Pilih Produk Obat:", produks)
 with col2:
+    # INPUT DISKON DIAKTIFKAN KEMBALI DI SINI
     diskon = st.number_input("Diskon (%)", min_value=0, max_value=100, value=0, step=1)
 
 if st.button("➕ Tambah ke SPH", use_container_width=True):
@@ -97,7 +98,7 @@ if st.button("➕ Tambah ke SPH", use_container_width=True):
         'Diskon': diskon,
         'Harga Jadi Satuan': harga_jadi_satuan
     })
-    st.success(f"Berhasil menambahkan {selected_produk}!")
+    st.success(f"Berhasil menambahkan {selected_produk} dengan diskon {diskon}%!")
 
 if len(st.session_state.keranjang) > 0:
     st.markdown("### 📋 Daftar Produk di SPH:")
@@ -180,7 +181,6 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_text_color(40, 40, 40)
         pdf.set_draw_color(180, 180, 180)
         
-        # Lebar kolom disesuaikan agar proporsional
         col_widths = [45, 56, 15, 10, 25, 12, 33] 
         headers = ['Nama Produk', 'Komposisi', 'Satuan', 'Isi', 'HNA (Rp)', 'Disc', 'Harga Jadi / Sat']
         
@@ -202,11 +202,10 @@ if len(st.session_state.keranjang) > 0:
                 f"{item['Harga Jadi Satuan']:,.0f}"
             ]
             
-            # Perhitungan akurat tinggi baris berdasarkan panjang teks & lebar kolom
             max_lines = 1
             for i, text in enumerate(row):
-                col_w = col_widths[i] - 4 # padding aman
-                chars_per_line = max(1, int(col_w / 2.1)) # perkiraan karakter per baris font ukuran 8
+                col_w = col_widths[i] - 4
+                chars_per_line = max(1, int(col_w / 2.1))
                 
                 total_lines = 0
                 for paragraph in str(text).split('\n'):
@@ -216,7 +215,7 @@ if len(st.session_state.keranjang) > 0:
                 if total_lines > max_lines:
                     max_lines = total_lines
                     
-            max_h = max(6, max_lines * 4.2 + 3) # padding vertikal ekstra agar tidak menembus garis
+            max_h = max(6, max_lines * 4.2 + 3)
                 
             start_x = pdf.get_x()
             start_y = pdf.get_y()
@@ -231,7 +230,6 @@ if len(st.session_state.keranjang) > 0:
                 pdf.rect(x, y, col_widths[i], max_h)
                 
                 align = 'R' if i in [4, 5, 6] else 'C' if i in [2, 3] else 'L'
-                # Menggunakan padding vertikal kecil di dalam cell
                 pdf.set_xy(x + 1, y + 1.5)
                 pdf.multi_cell(col_widths[i] - 2, 3.8, str(row[i]), 0, align)
                 pdf.set_xy(x + col_widths[i], start_y)
