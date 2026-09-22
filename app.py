@@ -227,7 +227,7 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_draw_color(160, 160, 160) 
         
         col_widths = [35, 55, 16, 8, 20, 24] 
-        headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Jadi\n(Satuan/Terkecil)']
+        headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Per Unit)']
         
         start_x = pdf.get_x()
         start_y = pdf.get_y()
