@@ -175,8 +175,8 @@ if len(st.session_state.keranjang) > 0:
         class PDF(FPDF):
             def header(self):
                 if os.path.exists(logo_png):
-                    self.image(logo_png, 30, 12, 45)
-                    self.set_y(30)
+                    self.image(logo_png, 30, 12, 60)
+                    self.set_y(33)
                 else:
                     self.set_y(30)
                     self.set_font('Arial', 'B', 15)
