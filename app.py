@@ -300,12 +300,10 @@ if len(st.session_state.keranjang) > 0:
         if os.path.exists(qr_path):
             pdf.image(qr_path, 30, y_qr + 2, 20)
             
-        pdf.ln(24)
-        pdf.set_font('Arial', 'B', 10)
-        pdf.cell(0, 5, 'Ade Budi Susetyo', 0, 1, 'L')
-        
-        pdf.set_font('Arial', 'I', 8.5)
-        pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
+       pdf.set_font('Arial', 'B', 10)
+       pdf.cell(0, 5, 'Ade Budi Susetyo', 0, 1, 'L')
+       pdf.set_font('Arial', 'I', 8)
+       pdf.cell(0, 3, 'Area Manager', 0, 1, 'L')
         
         # === HALAMAN 2: LAMPIRAN (Hanya dicetak jika Checkbox dicentang) ===
         if tampilkan_lampiran:
