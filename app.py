@@ -58,7 +58,8 @@ if not df_sales.empty:
     ]
     
     if not matched_data.empty:
-        st.success( ditemukan riwayat transaksi untuk produk ini di **{selected_rs}**!)
+        # PERBAIKAN: Menambahkan huruf 'f' di depan string agar variabel terbaca
+        st.success(f"Ditemukan riwayat transaksi untuk produk ini di **{selected_rs}**!")
         
         # Tampilkan ringkasan rata-rata diskon
         avg_disc = matched_data['% Disc (G/J)'].mean()
