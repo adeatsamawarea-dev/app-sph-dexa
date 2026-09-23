@@ -1,34 +1,34 @@
-Nama Produk,Komposisi,Indikasi,Kemasan,Isi,Satuan,Jkn,Harga Hna
+Nama Produk,Komposisi,Indikasi,Kemasan,Isi,Satuan,Jkn,Harga Hna,Lampiran Brosur
 ALBAPURE 20% 100ML,Human Albumin 20%  100ml,"•Keadaan syok karena kehilangan darah dan plasma, infeksi
 •Defisiensi volume plasma sebelum, selama dan setelah
 operasi
 •Defisiensi albumin karena luka bakar, sirosis hati, sindrom
 nefrotik, gagal hati, gangguan sistem pencernaan
 •Edema serebral, ARDS, toksisitas gestational
-•Plasma exchangeisiensi albumin.",Botol,1,1650000,1300000,1650000
+•Plasma exchangeisiensi albumin.",Botol,1,1650000,1300000,1650000,
 ALBUMINAR 25% 100ML,HUMAN ALBUMIN 25% 100ML,"•Keadaan syok karena kehilangan darah dan plasma, infeksi
 •Defisiensi volume plasma sebelum, selama dan setelah
 operasi
 •Defisiensi albumin karena luka bakar, sirosis hati, sindrom
 nefrotik, gagal hati, gangguan sistem pencernaan
 •Edema serebral, ARDS, toksisitas gestational
-•Plasma exchangeisiensi albumin.",VIAL,1,2100000,1825000,2100000
-ALVEOFACT,SURFACTANT 54 MG,Alveofact diindikasikan untuk pengobatan sindrom gangguan pernapasan (RDS) pada neonatus.,VIAL,1,5250000,,5250000
-BERIATE 1000 IU,FACTOR VIII,Terapi dan profilaksis perdarahan pada pasien dengan hemofilia A (defisiensi faktor VIII bawaan).,VIAL,1,4000000,3010000,4000000
-BERIATE 500 IU,FACTOR VIII,Terapi dan profilaksis perdarahan pada pasien dengan hemofilia A (defisiensi faktor VIII bawaan).,VIAL,1,2400000,1590000,2400000
-BERIPLAST P COMBISET 1 ML,FIBRIN SEALENT SET (FIBRINOGEN) 1ML,"Beriplast P Combi-Set adalah lem fibrin (fibrin sealant) berbasis plasma manusia yang digunakan dalam pembedahan untuk menghentikan perdarahan (hemostasis) ketika metode konvensional tidak efektif. Obat ini bekerja dengan membentuk bekuan darah alami menggunakan faktor pembekuan, yaitu fibrinogen dan trombin, yang membantu penyembuhan luka bedah. ",VIAL,1,3800000,,3800000
-BERIPLAST P COMBISET 3 ML,FIBRIN SEALENT SET (FIBRINOGEN) 3ML,"Beriplast P Combi-Set adalah lem fibrin (fibrin sealant) berbasis plasma manusia yang digunakan dalam pembedahan untuk menghentikan perdarahan (hemostasis) ketika metode konvensional tidak efektif. Obat ini bekerja dengan membentuk bekuan darah alami menggunakan faktor pembekuan, yaitu fibrinogen dan trombin, yang membantu penyembuhan luka bedah. ",VIAL,1,7000000,,7000000
+•Plasma exchangeisiensi albumin.",VIAL,1,2100000,1825000,2100000,
+ALVEOFACT,SURFACTANT 54 MG,Alveofact diindikasikan untuk pengobatan sindrom gangguan pernapasan (RDS) pada neonatus.,VIAL,1,5250000,,5250000,
+BERIATE 1000 IU,FACTOR VIII,Terapi dan profilaksis perdarahan pada pasien dengan hemofilia A (defisiensi faktor VIII bawaan).,VIAL,1,4000000,3010000,4000000,
+BERIATE 500 IU,FACTOR VIII,Terapi dan profilaksis perdarahan pada pasien dengan hemofilia A (defisiensi faktor VIII bawaan).,VIAL,1,2400000,1590000,2400000,
+BERIPLAST P COMBISET 1 ML,FIBRIN SEALENT SET (FIBRINOGEN) 1ML,"Beriplast P Combi-Set adalah lem fibrin (fibrin sealant) berbasis plasma manusia yang digunakan dalam pembedahan untuk menghentikan perdarahan (hemostasis) ketika metode konvensional tidak efektif. Obat ini bekerja dengan membentuk bekuan darah alami menggunakan faktor pembekuan, yaitu fibrinogen dan trombin, yang membantu penyembuhan luka bedah. ",VIAL,1,3800000,,3800000,
+BERIPLAST P COMBISET 3 ML,FIBRIN SEALENT SET (FIBRINOGEN) 3ML,"Beriplast P Combi-Set adalah lem fibrin (fibrin sealant) berbasis plasma manusia yang digunakan dalam pembedahan untuk menghentikan perdarahan (hemostasis) ketika metode konvensional tidak efektif. Obat ini bekerja dengan membentuk bekuan darah alami menggunakan faktor pembekuan, yaitu fibrinogen dan trombin, yang membantu penyembuhan luka bedah. ",VIAL,1,7000000,,7000000,
 "BRIXA 2,5 MG",APIXABAN 2.5 MG,"1. Pencegahan strok: fibrilasi atrium non-valvular
 2. Pengobatan kejadian tromboemboli vena
-3. Pencegahan kejadian tromboemboli vena",TAB,30,12500,,375000
-BRIXA 5 MG,APIXABAN 5 MG,"Apixaban adalah obat untuk mencegah serta mengobati gumpalan darah yang menyumbat aliran darah dan menimbulkan gangguan kesehatan, seperti deep vein thrombosis (DVT) atau emboli paru. Obat ini juga dapat digunakan untuk menurunkan risiko terjadinya stroke atau emboli akibat atrial fibrilasi.",TAB,30,12500,,375000
+3. Pencegahan kejadian tromboemboli vena",TAB,30,12500,,375000,
+BRIXA 5 MG,APIXABAN 5 MG,"Apixaban adalah obat untuk mencegah serta mengobati gumpalan darah yang menyumbat aliran darah dan menimbulkan gangguan kesehatan, seperti deep vein thrombosis (DVT) atau emboli paru. Obat ini juga dapat digunakan untuk menurunkan risiko terjadinya stroke atau emboli akibat atrial fibrilasi.",TAB,30,12500,,375000,
 CEFRATAM 1G,SULBACTAM500MG + SEFERAZON 500MG,"Terapi Tunggal
 Cefratam diindikasikan untuk pengobatan infeksi berikut, ketika disebabkan oleh organisme yang sensitif:
 
 Infeksi saluran pernapasan atas dan bawah
 Infeksi saluran kemih atas dan bawah
 Peritonitis, cholecystitis, cholangitis, dan infeksi intraabdomen lainnya
-Infeksi kulit dan jaringan lunak",VIAL,1,225000,,225000
+Infeksi kulit dan jaringan lunak",VIAL,1,225000,,225000,
 CEFRIN,CEFPIROM 1GR,"Cefrin diindikasikan untuk terapi infeksi, baik sebelum organisme penyebab infeksi diketahui ataupun yang disebabkan oleh bakteri yang sensitif seperti:
 
 Infeksi saluran pernafasan bagian bawah (bronkopneumonia dan pneumonia lobaris)
@@ -37,75 +37,75 @@ Komplikasi infeksi saluran kemih bagian bawah
 Infeksi kulit dan jaringan lunak (selulitis, abses kulit dan luka terinfeksi)
 Infeksi pada pasien neutropenik
 Bakterimia / septikimia
-Infeksi-infeksi berat dari yang tercantum di atas",VIAL,1,335000,,335000
-CELENOX 200 MG,CELECOXIB 200 MG,"Celenox adalah obat untuk meredakan nyeri dan peradangan. Obat ini dapat digunakan untuk mengatasi osteoartritis, rheumatoid arthritis, ankylosing spondylitis, atau nyeri haid. Celenox tersedia dalam bentuk kapsul dan mengandung bahan aktif celecoxib.",TAB,30,9000,,270000
-DEMUCIN INJ 4 MG / 2 ML,BROMHEXINE HCL 2 MG / ML,"Sekresi mukus (dahak/lendir) yang abnormal: Kondisi di mana tubuh memproduksi dahak terlalu banyak atau terlalu kental.Gangguan transportasi mukus: Kondisi di mana saluran napas kesulitan untuk mengeluarkan dahak secara alami, sehingga menyebabkan dada terasa sesak atau batuk tidak produktif.",Amp,5,42000,,210000
+Infeksi-infeksi berat dari yang tercantum di atas",VIAL,1,335000,,335000,
+CELENOX 200 MG,CELECOXIB 200 MG,"Celenox adalah obat untuk meredakan nyeri dan peradangan. Obat ini dapat digunakan untuk mengatasi osteoartritis, rheumatoid arthritis, ankylosing spondylitis, atau nyeri haid. Celenox tersedia dalam bentuk kapsul dan mengandung bahan aktif celecoxib.",TAB,30,9000,,270000,
+DEMUCIN INJ 4 MG / 2 ML,BROMHEXINE HCL 2 MG / ML,"Sekresi mukus (dahak/lendir) yang abnormal: Kondisi di mana tubuh memproduksi dahak terlalu banyak atau terlalu kental.Gangguan transportasi mukus: Kondisi di mana saluran napas kesulitan untuk mengeluarkan dahak secara alami, sehingga menyebabkan dada terasa sesak atau batuk tidak produktif.",Amp,5,42000,,210000,
 "DIVITI PFS 2,5MG/0,5ML",FONDAPARINUX,"Pencegahan venous thromboembolic events (VTE) pada:
 
 Pasien yang menjalani bedah ortopedi mayor pada tungkai bawah, seperti hip fracture termasuk profilaksis diperpanjang, knee replacement surgery, hip replacement surgery.
 Pasien yang menjalani operasi abdomen yang memiliki risiko komplikasi tromboembolik.
-Pasien medis yang memiliki risiko VTE dan memiliki komplikasi tromboembolik karena mobilitas terbatas selama penyakit akut.",PFS,2,310000,242501,620000
-DOBUJECT 250MG/5ML,DOBUTAMINE,Membantu inotropik miokardium pada terapi gagal jantung kongestif akut atau syok kardiogenik.,AMP,5,136350,,681750
-DOFEN INJ 400MG/4ML,IBUPROFEN 100 MG/ 4 ML,"Digunakan untuk pengelolaan nyeri akut sedang hingga berat, seringkali sebagai tambahan analgesik opiat IV.",AMP,5,60000,63900,300000
-DOFEN INJ 800MG/8ML,IBUPROFEN 100 MG/ 8 ML,"Digunakan untuk pengelolaan nyeri akut sedang hingga berat, seringkali sebagai tambahan analgesik opiat IV.",AMP,5,80000,83900,400000
+Pasien medis yang memiliki risiko VTE dan memiliki komplikasi tromboembolik karena mobilitas terbatas selama penyakit akut.",PFS,2,310000,242501,620000,
+DOBUJECT 250MG/5ML,DOBUTAMINE,Membantu inotropik miokardium pada terapi gagal jantung kongestif akut atau syok kardiogenik.,AMP,5,136350,,681750,
+DOFEN INJ 400MG/4ML,IBUPROFEN 100 MG/ 4 ML,"Digunakan untuk pengelolaan nyeri akut sedang hingga berat, seringkali sebagai tambahan analgesik opiat IV.",AMP,5,60000,63900,300000,
+DOFEN INJ 800MG/8ML,IBUPROFEN 100 MG/ 8 ML,"Digunakan untuk pengelolaan nyeri akut sedang hingga berat, seringkali sebagai tambahan analgesik opiat IV.",AMP,5,80000,83900,400000,
 DRM 500MG,DORIPENEM 1GR,"Doripenem diindikasikan untuk pengobatan pada pasien dewasa dari infeksi-infeksi tersebut di bawah ini:
 
 Pneumonia nosokomial (termasuk pneumonia akibat penggunaan ventilator)
 Komplikasi infeksi intra-abdominal
 Pertimbangan harus diberikan untuk penatalaksanaan penggunaan antibakteri yang tepat
-Komposisi",VIAL,1,475000,,475000
+Komposisi",VIAL,1,475000,,475000,
 FIBRION 1.500.000 IU,STREPTOKINASE-1.500.000 IU,"Infark miokard akut
-Onset dalam 12 jam dengan elevasi segmen ST persisten atau terjadi left bundle-branch block baru. Catatan: Tidak ada pernyataan pada hasil terapi terkait pemberian melebihi jendela waktu yang diindikasikan di atas.",VIAL,1,4650000,3950000,4650000
-FLADEX INFUS 5%,METRONIDAZOLE INFUS 5%,"Infeksi bakteri anaerob (infeksi perut, kulit, tulang, sendi, ginekologi), serta infeksi trichomonal vaginitis dan bakterial vaginosis.",VIAL,1,85000,,85000
+Onset dalam 12 jam dengan elevasi segmen ST persisten atau terjadi left bundle-branch block baru. Catatan: Tidak ada pernyataan pada hasil terapi terkait pemberian melebihi jendela waktu yang diindikasikan di atas.",VIAL,1,4650000,3950000,4650000,
+FLADEX INFUS 5%,METRONIDAZOLE INFUS 5%,"Infeksi bakteri anaerob (infeksi perut, kulit, tulang, sendi, ginekologi), serta infeksi trichomonal vaginitis dan bakterial vaginosis.",VIAL,1,85000,,85000,
 FLAMICORT 40MG/1ML IM,TRIAMCINOLONE ACETONIDE 40MG,"Ketika terapi oral tidak memungkinkan atau tidak diperlukan sementara dalam penilaian dokter, injeksi Flamicort 40 mg/ml diindikasikan untuk penggunaan intramuskular sebagai berikut:
 
 Penyakit alergi
 Gangguan reumatik, sebagai terapi tambahan untuk pemberian jangka pendek (untuk membantu pasien mengatasi kesulitan selama eksaserbasi episode akut) pada: osteoartritis pascatraumatik, sinovitis osteoartritis, artritis reumatoid, bursitis akut atau sub-akut, epikondilitis, tenosinovitis nonspesifik akut, artritis gout akut, artritis psoriasis, spondilitis ankilosis, artritis reumatoid pada anak-anak.
 Penyakit kolagen, selama eksaserbasi atau sebagai terapi pemeliharaan pada kasus-kasus tertentu dari lupus eritematosus sistemik, karditis reumatik akut.
 Penyakit dermatologi, pemfigus, eritema multiforme yang berat (sindrom Stevens-Johnson), dermatitis eksfoliatif, bullous dermatitis herpetiformis, dermatitis seborea yang berat, psoriasis yang berat.
-Keadaan edema, untuk menginduksi diuresis atau remisi proteinuria pada sindrom nefrotik, tanpa uremia, dari tipe idiopatik atau yang disebabkan oleh lupus eritematosus.",VIAL,1,121200,,121200
+Keadaan edema, untuk menginduksi diuresis atau remisi proteinuria pada sindrom nefrotik, tanpa uremia, dari tipe idiopatik atau yang disebabkan oleh lupus eritematosus.",VIAL,1,121200,,121200,
 FLAMICORT 50MG/5ML IAD,TRIAMCINOLONE ACETONIDE 10MG,"Intra-artikular
 Injeksi Flamicort 10 mg/ml diindikasikan untuk pemberian intra-artikular atau intrabursal dan untuk injeksi melalui selubung tendon sebagai terapi tambahan untuk pemberian jangka pendek (untuk membantu pasien mengatasi kesulitan selama eksaserbasi episode akut) pada: sinovitis osteoartritis, artritis reumatoid, bursitis akut atau sub-akut, artritis gout akut, epikondilitis, tenosinovitis nonspesifik akut, dan osteoartritis pascatraumatik.
 
 Intradermal
-Pemberian injeksi intralesi Flamicort 10 mg/ml diindikasikan untuk pengobatan keloid, discoid lupus erythematosus, necrobiosis lipoidica diabeticorum, alopesia areata dan hipertrofia terlokalisasi, infiltrasi, lesi inflamasi dari: lichen planus, psoriasis plak, granuloma annulare, dan lichen simplex chronicus (neurodermatitis). Injeksi Flamicort 10 mg/ml dapat bermanfaat pada tumor kistik aponeurosis atau tendon (ganglion).",VIAL,1,126250,,126250
+Pemberian injeksi intralesi Flamicort 10 mg/ml diindikasikan untuk pengobatan keloid, discoid lupus erythematosus, necrobiosis lipoidica diabeticorum, alopesia areata dan hipertrofia terlokalisasi, infiltrasi, lesi inflamasi dari: lichen planus, psoriasis plak, granuloma annulare, dan lichen simplex chronicus (neurodermatitis). Injeksi Flamicort 10 mg/ml dapat bermanfaat pada tumor kistik aponeurosis atau tendon (ganglion).",VIAL,1,126250,,126250,
 FONDAPARINUX SODIUM,FONDAPARINUX,"Pencegahan venous thromboembolic events (VTE) pada:
 
 Pasien yang menjalani bedah ortopedi mayor pada tungkai bawah, seperti hip fracture termasuk profilaksis diperpanjang, knee replacement surgery, hip replacement surgery.
 Pasien yang menjalani operasi abdomen yang memiliki risiko komplikasi tromboembolik.
-Pasien medis yang memiliki risiko VTE dan memiliki komplikasi tromboembolik karena mobilitas terbatas selama penyakit akut.",PFS,5,200000,,1000000
-FOSMIDEX 1G,FOSFOMYCIN 1GR,"Fosfomycin adalah antibiotik yang umumnya digunakan untuk mengobati dan mencegah infeksi saluran kemih. Fosfomycin suntik juga dapat digunakan sebagai obat pilihan terakhir untuk mengatasi infeksi pada sendi atau tulang, meningitis, dan pneumonia.",VIAL,10,110000,,1100000
-FOSMIDEX 2G,FOSFOMYCIN 2GR,"Fosfomycin adalah antibiotik yang umumnya digunakan untuk mengobati dan mencegah infeksi saluran kemih. Fosfomycin suntik juga dapat digunakan sebagai obat pilihan terakhir untuk mengatasi infeksi pada sendi atau tulang, meningitis, dan pneumonia.",VIAL,10,220000,,2200000
+Pasien medis yang memiliki risiko VTE dan memiliki komplikasi tromboembolik karena mobilitas terbatas selama penyakit akut.",PFS,5,200000,,1000000,
+FOSMIDEX 1G,FOSFOMYCIN 1GR,"Fosfomycin adalah antibiotik yang umumnya digunakan untuk mengobati dan mencegah infeksi saluran kemih. Fosfomycin suntik juga dapat digunakan sebagai obat pilihan terakhir untuk mengatasi infeksi pada sendi atau tulang, meningitis, dan pneumonia.",VIAL,10,110000,,1100000,
+FOSMIDEX 2G,FOSFOMYCIN 2GR,"Fosfomycin adalah antibiotik yang umumnya digunakan untuk mengobati dan mencegah infeksi saluran kemih. Fosfomycin suntik juga dapat digunakan sebagai obat pilihan terakhir untuk mengatasi infeksi pada sendi atau tulang, meningitis, dan pneumonia.",VIAL,10,220000,,2200000,
 GELAFUSAL INFUSION 500ML,GELATIN 500ML,"Terapi Hipovolemia: Digunakan untuk mengembalikan volume darah yang hilang.
 Syok: Penanganan syok hipovolemik (perdarahan, trauma).
-Operasi: Stabilisasi sirkulasi darah sebelum dan selama operasi. ",PACK,1,200000,186500,200000
-GLUTIVEN INFUS,GLUTAMIN ASAM AMINO,Sediaan nutrisi parenteral intravena (IV) sebagai suplemen asam amino atau sediaan infus yang mengandung asam amino untuk kondisi pasien yang membutuhkan tambahan glutamin misalnya pasien pada kondisi hiperkatabolik dan hipermetabolik.,BTL,1,400000,245000,400000
+Operasi: Stabilisasi sirkulasi darah sebelum dan selama operasi. ",PACK,1,200000,186500,200000,
+GLUTIVEN INFUS,GLUTAMIN ASAM AMINO,Sediaan nutrisi parenteral intravena (IV) sebagai suplemen asam amino atau sediaan infus yang mengandung asam amino untuk kondisi pasien yang membutuhkan tambahan glutamin misalnya pasien pada kondisi hiperkatabolik dan hipermetabolik.,BTL,1,400000,245000,400000,
 GRANON 1MG,GRANISENTRON 1MG,"Granisetron diindikasikan untuk pencegahan dan pengobatan pada keadaan:
 
 Mual dan muntah akut maupun tertunda yang berhubungan dengan kemoterapi dan radioterapi
-Mual dan muntah pasca operasi",AMP,5,65000,,325000
+Mual dan muntah pasca operasi",AMP,5,65000,,325000,
 GRANON 3MG,GRANISENTRON 3MG,"Granisetron diindikasikan untuk pencegahan dan pengobatan pada keadaan:
 
-Mual dan muntah akut maupun tertunda yang berhubungan dengan kemoterapi dan radioterapi",AMP,5,125000,,625000
-HEMOLOK FERACRYLUM 1% 100ML,FERRACRILLUM 1%,"Hemolok adalah produk antiseptik dan hemostatik topikal yang digunakan untuk membersihkan luka luar (seperti luka robek, bisul, dan luka bakar) serta membantu menghentikan perdarahan ringan (oozing). Mengandung zat aktif Feracrylum 1%, produk ini tersedia dalam bentuk cair (liquid) dan gel, aman digunakan untuk segala usia, termasuk pasien dengan gangguan pembekuan darah. ",BTL,1,130000,,130000
-HEMOLOK Gel 15g/TUBE,FERRACRILLUM GEL 15GR,"Hemolok adalah produk antiseptik dan hemostatik topikal yang digunakan untuk membersihkan luka luar (seperti luka robek, bisul, dan luka bakar) serta membantu menghentikan perdarahan ringan (oozing). Mengandung zat aktif Feracrylum 1%, produk ini tersedia dalam bentuk cair (liquid) dan gel, aman digunakan untuk segala usia, termasuk pasien dengan gangguan pembekuan darah. ",BTL,1,100000,,100000
-HUMAN ALBUMIN BEHRING 20% x 100ML,HUMAN ALBUMIN 20% 100ML,Meningkatkan tekanan onkotik pada kondisi defisiensi onkotik. Diencerkan sebagai larutan albumin 4-5% untuk penggantian volume iso-onkotik dengan efek jangka panjang. Terapi untuk defisiensi albumin.,VIAL,1,1650000,1300000,1650000
-HUMAN ALBUMIN BEHRING 20% x 50ML,HUMAN ALBUMIN 20% 50ML,Meningkatkan tekanan onkotik pada kondisi defisiensi onkotik. Diencerkan sebagai larutan albumin 4-5% untuk penggantian volume iso-onkotik dengan efek jangka panjang. Terapi untuk defisiensi albumin.,VIAL,1,850000,675000,850000
-HYCEL MEDICAL SODIUM HYALURONAT,"MEDICAL SODIUM HYALURONATE 10MG/ML, GEL","HYCEL Sodium Hyaluronate adalah agen antiadhesi yang digunakan dalam prosedur bedah untuk mencegah perlekatan jaringan, sering digunakan dalam bentuk prefilled syringe.",PFS,1,1100000,1098678,1100000
-INBUMIN FC TABLET 250MG,STRIATIN 250MG,Membantu memelihara kesehatan.,TAB,30,6500,,195000
-INBUMIN FORTE,STRIATIN 5000MG,Membantu memelihara kesehatan dengan menambah nilai gizi.,SCH,5,60000,,300000
-ISORANE 250ML,ISOFLURAN 250ML,Anestesi umum inhalasi untuk digunakan sebagai induksi dan pemeliharaan.,BTL,1,1800000,,1800000
+Mual dan muntah akut maupun tertunda yang berhubungan dengan kemoterapi dan radioterapi",AMP,5,125000,,625000,
+HEMOLOK FERACRYLUM 1% 100ML,FERRACRILLUM 1%,"Hemolok adalah produk antiseptik dan hemostatik topikal yang digunakan untuk membersihkan luka luar (seperti luka robek, bisul, dan luka bakar) serta membantu menghentikan perdarahan ringan (oozing). Mengandung zat aktif Feracrylum 1%, produk ini tersedia dalam bentuk cair (liquid) dan gel, aman digunakan untuk segala usia, termasuk pasien dengan gangguan pembekuan darah. ",BTL,1,130000,,130000,
+HEMOLOK Gel 15g/TUBE,FERRACRILLUM GEL 15GR,"Hemolok adalah produk antiseptik dan hemostatik topikal yang digunakan untuk membersihkan luka luar (seperti luka robek, bisul, dan luka bakar) serta membantu menghentikan perdarahan ringan (oozing). Mengandung zat aktif Feracrylum 1%, produk ini tersedia dalam bentuk cair (liquid) dan gel, aman digunakan untuk segala usia, termasuk pasien dengan gangguan pembekuan darah. ",BTL,1,100000,,100000,
+HUMAN ALBUMIN BEHRING 20% x 100ML,HUMAN ALBUMIN 20% 100ML,Meningkatkan tekanan onkotik pada kondisi defisiensi onkotik. Diencerkan sebagai larutan albumin 4-5% untuk penggantian volume iso-onkotik dengan efek jangka panjang. Terapi untuk defisiensi albumin.,VIAL,1,1650000,1300000,1650000,
+HUMAN ALBUMIN BEHRING 20% x 50ML,HUMAN ALBUMIN 20% 50ML,Meningkatkan tekanan onkotik pada kondisi defisiensi onkotik. Diencerkan sebagai larutan albumin 4-5% untuk penggantian volume iso-onkotik dengan efek jangka panjang. Terapi untuk defisiensi albumin.,VIAL,1,850000,675000,850000,
+HYCEL MEDICAL SODIUM HYALURONAT,"MEDICAL SODIUM HYALURONATE 10MG/ML, GEL","HYCEL Sodium Hyaluronate adalah agen antiadhesi yang digunakan dalam prosedur bedah untuk mencegah perlekatan jaringan, sering digunakan dalam bentuk prefilled syringe.",PFS,1,1100000,1098678,1100000,
+INBUMIN FC TABLET 250MG,STRIATIN 250MG,Membantu memelihara kesehatan.,TAB,30,6500,,195000,
+INBUMIN FORTE,STRIATIN 5000MG,Membantu memelihara kesehatan dengan menambah nilai gizi.,SCH,5,60000,,300000,
+ISORANE 250ML,ISOFLURAN 250ML,Anestesi umum inhalasi untuk digunakan sebagai induksi dan pemeliharaan.,BTL,1,1800000,,1800000,
 KEMIDEX,KETAMINE HCL 50 MG,"Ketamine diindikasikan untuk induksi anestesi sebelum pemberian obat anestesi umum lainnya. Ketamine diindikasikan dalam obstetri, untuk kelahiran normal ataupun bedah caesar. Ketamine juga diindikasikan untuk mendukung obat anestesi potensi rendah seperti nitrous oxide.
-",VIAL,1,101000,,101000
+",VIAL,1,101000,,101000,
 KYBERNIN 50IU/ML x 10ML,ANTI TROMBIN III 50 IU/ML,"Profilaksis dan terapi dari komplikasi tromboembolik pada:
 
 Defisiensi antitrombin III herediter
-Defisiensi antitrombin III didapat",VIAL,1,5500000,,5500000
-LEVICA INJ 20MG/4ML,LEVOBUPIVACAINE,"Levobupivacaine adalah obat bius lokal jenis amino-amida (S-enantiomer dari bupivacaine) yang digunakan untuk anestesi bedah, termasuk epidural, intratekal, dan blok saraf tepi. ",AMP,5,65000,,325000
-LEVICA INJ 50MG/10ML,LEVOBUPIVACAINE,"Levobupivacaine adalah obat bius lokal jenis amino-amida (S-enantiomer dari bupivacaine) yang digunakan untuk anestesi bedah, termasuk epidural, intratekal, dan blok saraf tepi.",AMP,5,75000,,375000
+Defisiensi antitrombin III didapat",VIAL,1,5500000,,5500000,
+LEVICA INJ 20MG/4ML,LEVOBUPIVACAINE,"Levobupivacaine adalah obat bius lokal jenis amino-amida (S-enantiomer dari bupivacaine) yang digunakan untuk anestesi bedah, termasuk epidural, intratekal, dan blok saraf tepi. ",AMP,5,65000,,325000,
+LEVICA INJ 50MG/10ML,LEVOBUPIVACAINE,"Levobupivacaine adalah obat bius lokal jenis amino-amida (S-enantiomer dari bupivacaine) yang digunakan untuk anestesi bedah, termasuk epidural, intratekal, dan blok saraf tepi.",AMP,5,75000,,375000,
 PAMORELIN LYOPHILIZED POWDER FOR INJECTION 11.25 MG + KIT,"TRIPTORELIN 11,25 MG","Kanker Prostat: Mengurangi pertumbuhan sel kanker dengan menurunkan kadar testosteron.
 Endometriosis: Meredakan nyeri dan gejala lainnya.
-Pubertas Dini (Precocious Puberty): Memperlambat kematangan tubuh yang terlalu cepat pada anak-anak.",VIAL,1,3875000,,3875000
+Pubertas Dini (Precocious Puberty): Memperlambat kematangan tubuh yang terlalu cepat pada anak-anak.",VIAL,1,3875000,,3875000,
 PRIVIGEN INFUSION 10% 25ML,HUMAN NORMAL IMMUNOGLOBULIN,"Privigen larutan infus 10% digunakan untuk pengobatan pada kondisi-kondisi di bawah ini:
 
 Terapi pengganti
@@ -125,7 +125,7 @@ Mengatasi gangguan inflamasi tertentu (imunomodulasi) pada:
 Pasien anak dan dewasa yang tidak cukup memiliki keping darah (immune thrombocytopenic purpura (ITP)) yang berisiko tinggi akan terjadinya perdarahan atau yang akan menjalani tindakan pembedahan dengan tujuan untuk mengoreksi jumlah keping darah
 Pasien dengan penyakit akut yang ditandai oleh adanya peradangan saraf tepi yang menyebabkan kelemahan otot yang parah terutama pada kaki dan tungkai atas (Guillain-Barré syndrome)
 Pasien dengan penyakit akut yang paling banyak menyerang anak muda dan ditandai oleh peradangan pembuluh darah di seluruh tubuh (Kawasaki disease)
-Pasien dengan penyakit kronik yang ditandai oleh peradangan saraf tepi yang menyebabkan kelemahan otot dan/atau kebas terutama pada kaki dan tungkai atas (chronic inflammatory demyelinating polyneuropathy (CIDP))",Vial,1,3500000,2913750,3500000
+Pasien dengan penyakit kronik yang ditandai oleh peradangan saraf tepi yang menyebabkan kelemahan otot dan/atau kebas terutama pada kaki dan tungkai atas (chronic inflammatory demyelinating polyneuropathy (CIDP))",Vial,1,3500000,2913750,3500000,
 PRIVIGEN INFUSION 10% 50ML,HUMAN NORMAL IMMUNOGLOBULIN,"Privigen larutan infus 10% digunakan untuk pengobatan pada kondisi-kondisi di bawah ini:
 
 Terapi pengganti
@@ -145,40 +145,40 @@ Mengatasi gangguan inflamasi tertentu (imunomodulasi) pada:
 Pasien anak dan dewasa yang tidak cukup memiliki keping darah (immune thrombocytopenic purpura (ITP)) yang berisiko tinggi akan terjadinya perdarahan atau yang akan menjalani tindakan pembedahan dengan tujuan untuk mengoreksi jumlah keping darah
 Pasien dengan penyakit akut yang ditandai oleh adanya peradangan saraf tepi yang menyebabkan kelemahan otot yang parah terutama pada kaki dan tungkai atas (Guillain-Barré syndrome)
 Pasien dengan penyakit akut yang paling banyak menyerang anak muda dan ditandai oleh peradangan pembuluh darah di seluruh tubuh (Kawasaki disease)
-Pasien dengan penyakit kronik yang ditandai oleh peradangan saraf tepi yang menyebabkan kelemahan otot dan/atau kebas terutama pada kaki dan tungkai atas (chronic inflammatory demyelinating polyneuropathy (CIDP))",Vial,1,6800000,5858500,6800000
+Pasien dengan penyakit kronik yang ditandai oleh peradangan saraf tepi yang menyebabkan kelemahan otot dan/atau kebas terutama pada kaki dan tungkai atas (chronic inflammatory demyelinating polyneuropathy (CIDP))",Vial,1,6800000,5858500,6800000,
 PRONALGES SUPPO 100MG,KETOPROFEN SUPPO 100MG,"Ketoprofen digunakan untuk:
 
 Efek analgetik dan antiinflamasi pada pengobatan simtomatik dari rheumatoid arthritis dan osteoartritis akut dan kronik.
-Mengurangi nyeri ringan sampai menengah seperti nyeri setelah operasi (termasuk operasi gigi), postpartum, dan ortopedi.",SUPPO,10,20000,,200000
-RAIVAS INJ 4ML,NOREPINEPHRIN 4ML,"Untuk mengontrol tekanan darah pada keadaan hipotensi akut (seperti, pheochromocytomectomy, sympathectomy, poliomyelitis, spinal anesthesia, infark miokard, septikemia, transfusi darah, dan reaksi obat). Sebagai terapi tambahan pada henti jantung dan hipotensi berat. Untuk memperbaiki dan mempertahankan tekanan darah yang adekuat setelah denyut jantung dan ventilasi jantung efektif telah dicapai dengan cara lain.",AMP,5,102000,,510000
+Mengurangi nyeri ringan sampai menengah seperti nyeri setelah operasi (termasuk operasi gigi), postpartum, dan ortopedi.",SUPPO,10,20000,,200000,
+RAIVAS INJ 4ML,NOREPINEPHRIN 4ML,"Untuk mengontrol tekanan darah pada keadaan hipotensi akut (seperti, pheochromocytomectomy, sympathectomy, poliomyelitis, spinal anesthesia, infark miokard, septikemia, transfusi darah, dan reaksi obat). Sebagai terapi tambahan pada henti jantung dan hipotensi berat. Untuk memperbaiki dan mempertahankan tekanan darah yang adekuat setelah denyut jantung dan ventilasi jantung efektif telah dicapai dengan cara lain.",AMP,5,102000,,510000,
 RECOFOL N,PROPOFOL,"Induksi dan pemeliharaan untuk anestesi umum
-Sedasi pada pasien dengan perawatan intensif",AMP,5,100000,,500000
-REDURA PATCH RDS-4 (40 MM X 60 MM),POLY-L-LACTIDE (PLLA),Produk ini diaplikasikan dalam operasi perbaikan melalui pembedahan dalam kasus kerusakan dural destruktif.,PATCH,1,4777500,5050500,4777500
-REDURA PATCH RDS-6 (60mm X 80mm),POLY-L-LACTIDE (PLLA),Produk ini diaplikasikan dalam operasi perbaikan melalui pembedahan dalam kasus kerusakan dural destruktif.,PATCH,1,7950000,8408250,7950000
-REMOPAIN PREFILLED SYRINGE,KETOROLAC 3% PFS,"Ketorolac diindikasikan untuk penatalaksanaan nyeri akut yang berat jangka pendek (≤5 hari), yang memerlukan analgesia setingkat opioid.",PFS,5,45000,,225000
-REPACOR,"PARECOXIB SODIUM 40MG, SERBUK INJ",Pengobatan jangka pendek nyeri pascaoperasi.,VIAL,1,135000,,135000
-ROCUM INJ 1% 5ML,ROCURONIUM BROMIDE 10 MG,Rocuronium bromide diindikasikan sebagai tambahan pada anestesi umum untuk memfasilitasi rapid sequence dan intubasi trakea rutin serta memberikan efek relaksasi pada otot rangka selama pembedahan atau ventilasi mekanik.,AMP,10,135000,,1350000
+Sedasi pada pasien dengan perawatan intensif",AMP,5,100000,,500000,
+REDURA PATCH RDS-4 (40 MM X 60 MM),POLY-L-LACTIDE (PLLA),Produk ini diaplikasikan dalam operasi perbaikan melalui pembedahan dalam kasus kerusakan dural destruktif.,PATCH,1,4777500,5050500,4777500,
+REDURA PATCH RDS-6 (60mm X 80mm),POLY-L-LACTIDE (PLLA),Produk ini diaplikasikan dalam operasi perbaikan melalui pembedahan dalam kasus kerusakan dural destruktif.,PATCH,1,7950000,8408250,7950000,
+REMOPAIN PREFILLED SYRINGE,KETOROLAC 3% PFS,"Ketorolac diindikasikan untuk penatalaksanaan nyeri akut yang berat jangka pendek (≤5 hari), yang memerlukan analgesia setingkat opioid.",PFS,5,45000,,225000,
+REPACOR,"PARECOXIB SODIUM 40MG, SERBUK INJ",Pengobatan jangka pendek nyeri pascaoperasi.,VIAL,1,135000,,135000,
+ROCUM INJ 1% 5ML,ROCURONIUM BROMIDE 10 MG,Rocuronium bromide diindikasikan sebagai tambahan pada anestesi umum untuk memfasilitasi rapid sequence dan intubasi trakea rutin serta memberikan efek relaksasi pada otot rangka selama pembedahan atau ventilasi mekanik.,AMP,10,135000,,1350000,
 SEDACUM INJ 15MG/3ML,MIDAZOLAM INJ 15MG/3ML,"Injeksi Sedacum diindikasikan untuk:
 
 Premedikasi, sebelum induksi anestesi (IM)
 Basal sedation, sebelum tindakan diagnostik atau pembedahan yang dilakukan di bawah antestesi lokal (IV)
-Induksi dan pemeliharaan selama anestesi, sebagai zat penginduksi pada anestesi inhalasi atau komponen penginduksi tidur dalam anestesi kombinasi, termasuk anestesi intravena lokal (IV)",AMP,5,55600,,278000
+Induksi dan pemeliharaan selama anestesi, sebagai zat penginduksi pada anestesi inhalasi atau komponen penginduksi tidur dalam anestesi kombinasi, termasuk anestesi intravena lokal (IV)",AMP,5,55600,,278000,
 SEDACUM INJ 5MG/5ML,MIDAZOLAM INJ 5MG /5ML,"Injeksi Sedacum diindikasikan untuk:
 
 Premedikasi, sebelum induksi anestesi (IM)
 Basal sedation, sebelum tindakan diagnostik atau pembedahan yang dilakukan di bawah antestesi lokal (IV)
-Induksi dan pemeliharaan selama anestesi, sebagai zat penginduksi pada anestesi inhalasi atau komponen penginduksi tidur dalam anestesi kombinasi, termasuk anestesi intravena lokal (IV)",AMP,10,27300,,273000
-SEVODEX 250ML,SEVOFLURAN 250ML,Sevoflurane diindikasikan untuk induksi dan pemeliharaan anestesi umum pada orang dewasa dan anak-anak untuk operasi pasien rawat jalan dan rawat inap.,BTL,1,2727000,,2727000
-SEVOFLURANE GENERIK,SEVOFLURAN 250ML,Sevoflurane diindikasikan untuk induksi dan pemeliharaan anestesi umum pada orang dewasa dan anak-anak untuk operasi pasien rawat jalan dan rawat inap.,BTL,1,1600000,721500,1600000
-SINOVIAL PFS + NEEDLE,SODIUM HYALURONATE 16MG/2ML,"Nyeri atau berkurangnya mobilitas karena penyakit degeneratif, penyakit post-trauma, alterasi sendi dan otot. Sinovial sebagai pengganti cairan sinovial, yang memperbaiki sifat fisiologi dan reologi dari sendi yang mengalami arthrosis.",BOX,1,375000,182817,375000
-STRONGER NEO MINOPHAGEN C,"GLYCYRHIZIN, GLYCINE, L-CYSTEIN",Memperbaiki gangguan fungsi hati pada penyakit hati kronis.,AMP,1,110000,,110000
-STYPCEL,OXIDATION OF REGENERATED CELLULOSE 5.0 CM x 2.5 CM,"StypCel™ adalah bahan hemostat absorbable (dapat diserap) berbentuk non-woven fabric yang terbuat dari oxidized regenerated cellulose. Produk Medprin ini digunakan dalam pembedahan untuk menghentikan perdarahan kapiler, vena, dan arteri kecil secara cepat (dalam beberapa menit) ketika metode konvensional tidak efektif. ",Lembar,10,265000,2775000,2650000
-TERLIPIN,TERLIPRESSIN ACETATE,Terlipressin diindikasikan untuk pengobatan perdarahan varises esofagus.,Vial,1,575000,,575000
+Induksi dan pemeliharaan selama anestesi, sebagai zat penginduksi pada anestesi inhalasi atau komponen penginduksi tidur dalam anestesi kombinasi, termasuk anestesi intravena lokal (IV)",AMP,10,27300,,273000,
+SEVODEX 250ML,SEVOFLURAN 250ML,Sevoflurane diindikasikan untuk induksi dan pemeliharaan anestesi umum pada orang dewasa dan anak-anak untuk operasi pasien rawat jalan dan rawat inap.,BTL,1,2727000,,2727000,
+SEVOFLURANE 250 ml,SEVOFLURAN 250ML INHALASI,Sevoflurane diindikasikan untuk induksi dan pemeliharaan anestesi umum pada orang dewasa dan anak-anak untuk operasi pasien rawat jalan dan rawat inap.,BTL,1,1600000,721500,1600000,
+SINOVIAL PFS + NEEDLE,SODIUM HYALURONATE 16MG/2ML,"Nyeri atau berkurangnya mobilitas karena penyakit degeneratif, penyakit post-trauma, alterasi sendi dan otot. Sinovial sebagai pengganti cairan sinovial, yang memperbaiki sifat fisiologi dan reologi dari sendi yang mengalami arthrosis.",BOX,1,375000,182817,375000,
+STRONGER NEO MINOPHAGEN C,"GLYCYRHIZIN, GLYCINE, L-CYSTEIN",Memperbaiki gangguan fungsi hati pada penyakit hati kronis.,AMP,1,110000,,110000,
+STYPCEL,OXIDATION OF REGENERATED CELLULOSE 5.0 CM x 2.5 CM,"StypCel™ adalah bahan hemostat absorbable (dapat diserap) berbentuk non-woven fabric yang terbuat dari oxidized regenerated cellulose. Produk Medprin ini digunakan dalam pembedahan untuk menghentikan perdarahan kapiler, vena, dan arteri kecil secara cepat (dalam beberapa menit) ketika metode konvensional tidak efektif. ",Lembar,10,265000,2775000,2650000,
+TERLIPIN,TERLIPRESSIN ACETATE,Terlipressin diindikasikan untuk pengobatan perdarahan varises esofagus.,Vial,1,575000,,575000,
 TETAGAM P. Prefilled Syringe 1mL,HUMAN TETANUS IMMUNOGLOBULIN,"Terapi tetanus dengan manifestasi klinis
-Tetanus imunoglobulin harus diberikan bersamaan dengan vaksinasi tetanus aktif kecuali terdapat kontraindikasi atau adanya konfirmasi status imunisasi yang adekuat.",PFS,1,297275,215500,297275
-TIZOS INJ 1 GR,CEFTIZOXIME 1GR,"Infeksi-infeksi yang disebabkan oleh Streptococcus sp. (tidak termasuk Enterococci), Streptococcus pneumoniae, Haemophilus influenzae, Eschericia coli, Klebsiella sp., Proteus sp., Serratia sp., Enterobacter sp., Citrobacter sp., Peptococcus sp., Peptostreptococcus sp., dan Bacteroides sp. yang rentan terhadap ceftizoxime.",VIAL,1,240000,,240000
-TRAMUS 1% 2.5ML,"ATRACURIUM 1% 2,5ML","Sebagai adjuvan terhadap anesthesi umum agar intubasi tracheal dapat dilakukan dan untuk relaksasi otot rangka selama proses pembedahan atau ventilasi terkendali, serta untuk memfasilitasi ventilasi mekanik pada pasien Intensive Care Unit (ICU).",AMP,5,55550,,277750
-TRAMUS 1% 5ML,ATRACURIUM 1% 5ML,"Sebagai adjuvan terhadap anesthesi umum agar intubasi tracheal dapat dilakukan dan untuk relaksasi otot rangka selama proses pembedahan atau ventilasi terkendali, serta untuk memfasilitasi ventilasi mekanik pada pasien Intensive Care Unit (ICU).",AMP,5,84000,,420000
+Tetanus imunoglobulin harus diberikan bersamaan dengan vaksinasi tetanus aktif kecuali terdapat kontraindikasi atau adanya konfirmasi status imunisasi yang adekuat.",PFS,1,297275,215500,297275,
+TIZOS INJ 1 GR,CEFTIZOXIME 1GR,"Infeksi-infeksi yang disebabkan oleh Streptococcus sp. (tidak termasuk Enterococci), Streptococcus pneumoniae, Haemophilus influenzae, Eschericia coli, Klebsiella sp., Proteus sp., Serratia sp., Enterobacter sp., Citrobacter sp., Peptococcus sp., Peptostreptococcus sp., dan Bacteroides sp. yang rentan terhadap ceftizoxime.",VIAL,1,240000,,240000,
+TRAMUS 1% 2.5ML,"ATRACURIUM 1% 2,5ML","Sebagai adjuvan terhadap anesthesi umum agar intubasi tracheal dapat dilakukan dan untuk relaksasi otot rangka selama proses pembedahan atau ventilasi terkendali, serta untuk memfasilitasi ventilasi mekanik pada pasien Intensive Care Unit (ICU).",AMP,5,55550,,277750,
+TRAMUS 1% 5ML,ATRACURIUM 1% 5ML,"Sebagai adjuvan terhadap anesthesi umum agar intubasi tracheal dapat dilakukan dan untuk relaksasi otot rangka selama proses pembedahan atau ventilasi terkendali, serta untuk memfasilitasi ventilasi mekanik pada pasien Intensive Care Unit (ICU).",AMP,5,84000,,420000,
 TRICEFIN INJ 1GR,CEFTRIAXONE 1GR,"Infeksi-infeksi yang disebabkan oleh bakteri yang sensitif terhadap ceftriaxone antara lain:
 
 Infeksi saluran pernapasan bagian bawah
@@ -187,7 +187,7 @@ Infeksi tulang dan sendi
 Infeksi intra-abdominal
 Infeksi saluran kemih; meningitis; septikemia; gonore
 Pencegahan infeksi pra bedah
-Pasien infeksi dengan gangguan mekanisme daya tahan tubuh",VIAL,1,260000,,260000
+Pasien infeksi dengan gangguan mekanisme daya tahan tubuh",VIAL,1,260000,,260000,
 TRIFENEM INJ 1GR,MEROPENEM 1000MG,"Meropenem trihydrate diindikasikan sebagai terapi tunggal, pada orang dewasa dan anak-anak, untuk pengobatan infeksi yang disebabkan oleh strain yang peka, baik tunggal ataupun multipel, dan mikroorganisme yang sensitif terhadap meropenem:
 
 Pneumonia dan Pneumonia Nosokomial
@@ -198,17 +198,17 @@ Infeksi kulit dan struktur kulit
 Meningitis
 Septikemia
 Terapi empiris untuk dugaan infeksi pada pasien dewasa dengan neutropenia febril. Meropenem digunakan sebagai terapi tunggal atau kombinasi dengan antivirus atau antijamur
-Meropenem trihydrate terbukti efektif pada terapi tunggal atau kombinasi dengan antimikroba lain dalam pengobatan infeksi polimikroba",VIAL,1,610000,,610000
-VIVENA-9,"Vitamin C 100mg, Vit B1 2.5mg, Vit B2 3.6mg, Nicotinamide 40mg, panthothenic acid 15mg, Pyridoxine 4 mg, Folic Acid 400mcg,vit B12 5mcg,Biotin 60 mcg",Vivena-9 diindikasikan pada pasien dewasa dan anak-anak sebagai suplemen dalam nutrisi intravena untuk memenuhi kebutuhan harian vitamin larut air.,VIAL,1,80000,,80000
+Meropenem trihydrate terbukti efektif pada terapi tunggal atau kombinasi dengan antimikroba lain dalam pengobatan infeksi polimikroba",VIAL,1,610000,,610000,
+VIVENA-9,"Vitamin C 100mg, Vit B1 2.5mg, Vit B2 3.6mg, Nicotinamide 40mg, panthothenic acid 15mg, Pyridoxine 4 mg, Folic Acid 400mcg,vit B12 5mcg,Biotin 60 mcg",Vivena-9 diindikasikan pada pasien dewasa dan anak-anak sebagai suplemen dalam nutrisi intravena untuk memenuhi kebutuhan harian vitamin larut air.,VIAL,1,80000,,80000,
 VOMIZOLE DRY INJECTION 40MG,PANTOPRAZOLE INJ 40MG,"Ulkus duodenal
 Gastric ulcer
 Reflux esophagitis, kasus-kasus inflamasi esofagus yang sedang dan berat
-Sindrom Zollinger-Ellison",VIAL,1,185000,,185000
+Sindrom Zollinger-Ellison",VIAL,1,185000,,185000,
 VOMIZOLE TABLET 20MG,PANTOPRAZOLE 20MG,"Gejala gastroesophageal reflux disease (GERD)
 Gejala nonerosive reflux disease (NERD)
 Untuk penanganan jangka panjang reflux esophagitis sedang dan berat
-",TAB,10,15600,,156000
+",TAB,10,15600,,156000,
 VOMIZOLE TABLET 40MG,PANTOPRAZOLE 40MG,"Gejala gastroesophageal reflux disease (GERD)
 Gejala nonerosive reflux disease (NERD)
 Untuk penanganan jangka panjang reflux esophagitis sedang dan berat
-",TAB,10,19500,,195000
+",TAB,10,19500,,195000,
