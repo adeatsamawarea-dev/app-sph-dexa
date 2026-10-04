@@ -11,7 +11,6 @@ import qrcode
 st.set_page_config(page_title="SPH - SOLHAYS 2026", page_icon="📄", layout="centered")
 
 st.title("📄 SPH - SOLHAYS 2026")
-st.subheader("Format Portrait (Final & Rapi)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
