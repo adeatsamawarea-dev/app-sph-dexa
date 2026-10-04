@@ -11,12 +11,11 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Tata Letak Baru & Elegan)")
+st.subheader("Format Portrait (Final & Rapi)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
     if pd.isna(text): return "-"
-    # Membersihkan spasi ganda agar nama RS seperti "RS PKU Muh.  Sukoharjo" menyatu rapi
     cleaned = re.sub(r'\s+', ' ', str(text)).strip()
     return cleaned.replace('•', '- ').encode('latin-1', 'replace').decode('latin-1')
 
@@ -43,6 +42,18 @@ def safe_float(val):
     try: return float(val_str)
     except: return 0.0
 
+# Terjemahan Bulan Indonesia
+BULAN_ID = {
+    1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
+    7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember'
+}
+
+def tanggal_indo(dt):
+    hari = dt.strftime('%d')
+    bulan = BULAN_ID[dt.month]
+    tahun = dt.strftime('%Y')
+    return f"{hari} {bulan} {tahun}"
+
 @st.cache_data
 def load_data():
     df_cust = pd.read_csv("SPH2026_Customer.csv")
@@ -63,7 +74,6 @@ produks = df_harga['Nama Produk'].dropna().unique().tolist()
 if 'keranjang' not in st.session_state:
     st.session_state.keranjang = []
 
-# --- FILE REKAP CSV ---
 REKAP_FILE = "Rekap_SPH.csv"
 
 def simpan_ke_rekap(data_rows):
@@ -147,7 +157,7 @@ if len(st.session_state.keranjang) > 0:
     df_tampil['Diskon'] = df_tampil['Diskon'].apply(lambda x: f"{x}%")
     st.table(df_tampil)
     
-    if st.button("🗑️️ Hapus Semua Produk", type="secondary"):
+    if st.button("🗑️ Hapus Semua Produk", type="secondary"):
         st.session_state.keranjang = []
         st.rerun()
 
@@ -188,7 +198,6 @@ if len(st.session_state.keranjang) > 0:
 
         class PDF(FPDF):
             def header(self):
-                # Logo diperbesar (75mm) dipindah ke Kanan Atas
                 if os.path.exists(logo_png):
                     self.image(logo_png, 110, 12, 75)
                 self.set_y(32)
@@ -204,20 +213,24 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_margins(25, 30, 25)
         pdf.add_page()
 
-        # Tanggal dipindah ke Kiri Atas
-        tgl_sekarang = datetime.datetime.now().strftime("%d %B %Y")
+        tgl_indo_str = tanggal_indo(datetime.datetime.now())
         pdf.set_font('Arial', '', 10)
         pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 5, f'Surakarta, {tgl_sekarang}', 0, 1, 'L')
+        pdf.cell(0, 5, f'Surakarta, {tgl_indo_str}', 0, 1, 'L')
 
         pdf.ln(4)
+        # Perihal & Nomor di-align dengan titik dua sejajar rapi
+        pdf.set_font('Arial', '', 10)
+        pdf.cell(17, 5, 'Perihal', 0, 0, 'L')
+        pdf.cell(3, 5, ':', 0, 0, 'C')
         pdf.set_font('Arial', 'BU', 11)
-        pdf.cell(0, 5, 'Perihal : Surat Penawaran Harga', 0, 1, 'L')
-        
-        # Nomor SPH ditaruh di bawah Perihal agar lebih rapi
-        pdf.set_font('Arial', '', 9.5)
-        pdf.set_text_color(80, 80, 80)
-        pdf.cell(0, 4, f'Nomor : {no_dokumen}', 0, 1, 'L')
+        pdf.cell(0, 5, 'Surat Penawaran Harga', 0, 1, 'L')
+
+        pdf.set_font('Arial', '', 10)
+        pdf.cell(17, 5, 'Nomor', 0, 0, 'L')
+        pdf.cell(3, 5, ':', 0, 0, 'C')
+        pdf.set_font('Arial', '', 10)
+        pdf.cell(0, 5, no_dokumen, 0, 1, 'L')
         pdf.set_text_color(0, 0, 0)
 
         pdf.ln(6) 
@@ -232,7 +245,6 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 5, 'Dengan hormat,', 0, 1, 'L')
 
-        # Menggabungkan nama outlet secara utuh tanpa spasi berlebih
         kalimat_pembuka = f"Sebelumnya kami menyampaikan terimakasih kepada {nama_outlet_str} atas kepercayaan dan kerjasama yang telah terjalin dengan baik selama ini dengan PT Dexa Medica. Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :"
         pdf.multi_cell(0, 5, kalimat_pembuka)
         pdf.ln(4)
@@ -244,7 +256,7 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_draw_color(160, 160, 160) 
 
         col_widths = [35, 55, 16, 8, 20, 24] 
-        headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Per Unit']
+        headers = ['Nama Produk', 'Komposisi', 'Kemasan', 'Isi', 'HNA (Rp)', 'Harga Per Unit\n(Sudah PPN)']
 
         start_x = pdf.get_x()
         start_y = pdf.get_y()
@@ -256,7 +268,7 @@ if len(st.session_state.keranjang) > 0:
             pdf.rect(x, y, col_widths[i], max_h_header, style='DF')
             if '\n' in headers[i]:
                 pdf.set_xy(x, y + 1.5)
-                pdf.multi_cell(col_widths[i], 3.5, headers[i], 0, 'C')
+                pdf.multi_cell(col_widths[i], 3.2, headers[i], 0, 'C')
             else:
                 pdf.set_xy(x, y + 3)
                 pdf.multi_cell(col_widths[i], 4, headers[i], 0, 'C')
