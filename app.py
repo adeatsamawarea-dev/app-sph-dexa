@@ -11,12 +11,14 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Elegan & Auto Rekap)")
+st.subheader("Format Portrait (Tata Letak Baru & Elegan)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
     if pd.isna(text): return "-"
-    return str(text).replace('•', '- ').encode('latin-1', 'replace').decode('latin-1')
+    # Membersihkan spasi ganda agar nama RS seperti "RS PKU Muh.  Sukoharjo" menyatu rapi
+    cleaned = re.sub(r'\s+', ' ', str(text)).strip()
+    return cleaned.replace('•', '- ').encode('latin-1', 'replace').decode('latin-1')
 
 def safe_float(val):
     if pd.isna(val): return 0.0
@@ -145,13 +147,11 @@ if len(st.session_state.keranjang) > 0:
     df_tampil['Diskon'] = df_tampil['Diskon'].apply(lambda x: f"{x}%")
     st.table(df_tampil)
     
-    if st.button("🗑️ Hapus Semua Produk", type="secondary"):
+    if st.button("🗑️️ Hapus Semua Produk", type="secondary"):
         st.session_state.keranjang = []
         st.rerun()
 
     st.markdown("---")
-    
-    # Opsi Tambahan untuk Lampiran di Halaman 2
     tampilkan_lampiran = st.checkbox("Sertakan Halaman Lampiran (Indikasi & Brosur)", value=True)
 
     # --- GENERATE PDF & LOGGING REKAP ---
@@ -188,15 +188,10 @@ if len(st.session_state.keranjang) > 0:
 
         class PDF(FPDF):
             def header(self):
+                # Logo diperbesar (75mm) dipindah ke Kanan Atas
                 if os.path.exists(logo_png):
-                    self.image(logo_png, 30, 12, 60)
-                    self.set_y(33)
-                else:
-                    self.set_y(30)
-                    self.set_font('Arial', 'B', 15)
-                    self.set_text_color(0, 86, 179)
-                    self.cell(0, 8, 'PT DEXA MEDICA', 0, 1, 'L')
-                    self.ln(5)
+                    self.image(logo_png, 110, 12, 75)
+                self.set_y(32)
 
             def footer(self):
                 self.set_y(-25)
@@ -204,21 +199,28 @@ if len(st.session_state.keranjang) > 0:
                 self.set_text_color(128)
                 self.cell(0, 10, f'Halaman {self.page_no()}', 0, 0, 'C')
 
-        # === HALAMAN 1: SURAT UTAMA (Format Elegan Sesuai Permintaan Anda) ===
+        # === HALAMAN 1: SURAT UTAMA ===
         pdf = PDF('P', 'mm', 'A4')
         pdf.set_margins(25, 30, 25)
         pdf.add_page()
 
+        # Tanggal dipindah ke Kiri Atas
         tgl_sekarang = datetime.datetime.now().strftime("%d %B %Y")
         pdf.set_font('Arial', '', 10)
         pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 5, f'Surakarta, {tgl_sekarang}', 0, 1, 'R')
+        pdf.cell(0, 5, f'Surakarta, {tgl_sekarang}', 0, 1, 'L')
 
-        pdf.ln(3)
+        pdf.ln(4)
         pdf.set_font('Arial', 'BU', 11)
-        pdf.cell(0, 5, f'Perihal : Surat Penawaran Harga ({no_dokumen})', 0, 1, 'L')
+        pdf.cell(0, 5, 'Perihal : Surat Penawaran Harga', 0, 1, 'L')
+        
+        # Nomor SPH ditaruh di bawah Perihal agar lebih rapi
+        pdf.set_font('Arial', '', 9.5)
+        pdf.set_text_color(80, 80, 80)
+        pdf.cell(0, 4, f'Nomor : {no_dokumen}', 0, 1, 'L')
+        pdf.set_text_color(0, 0, 0)
 
-        pdf.ln(8) 
+        pdf.ln(6) 
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 5, 'Kepada Yth,', 0, 1, 'L')
         pdf.cell(0, 5, 'Kepala Farmasi', 0, 1, 'L')
@@ -230,7 +232,8 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', '', 10)
         pdf.cell(0, 5, 'Dengan hormat,', 0, 1, 'L')
 
-        kalimat_pembuka = f"Sebelumnya kami menyampaikan terimakasih kepada {nama_outlet_str} atas kepercayaan dan kerjasama yang telah terjalin dengan baik selama ini dengan PT Dexa Medica . Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :"
+        # Menggabungkan nama outlet secara utuh tanpa spasi berlebih
+        kalimat_pembuka = f"Sebelumnya kami menyampaikan terimakasih kepada {nama_outlet_str} atas kepercayaan dan kerjasama yang telah terjalin dengan baik selama ini dengan PT Dexa Medica. Bersama surat ini kami PT. Dexa Medica mengajukan penawaran harga untuk produk berikut :"
         pdf.multi_cell(0, 5, kalimat_pembuka)
         pdf.ln(4)
 
@@ -321,7 +324,7 @@ if len(st.session_state.keranjang) > 0:
         pdf.set_font('Arial', 'I', 8)
         pdf.cell(0, 4, 'Area Manager', 0, 1, 'L') 
 
-        # === HALAMAN 2: LAMPIRAN (Hanya dicetak jika Checkbox dicentang) ===
+        # === HALAMAN 2: LAMPIRAN ===
         if tampilkan_lampiran:
             pdf.add_page()
             pdf.set_font('Arial', 'B', 11)
