@@ -11,7 +11,7 @@ import qrcode
 st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
 
 st.title("📄 Cetak SPH - Mobile")
-st.subheader("Format Portrait (Auto Rekap & Notifikasi Riwayat)")
+st.subheader("Format Portrait (Pilihan Input Diskon / Harga Jadi)")
 
 # --- FUNGSI PENDUKUNG ---
 def sanitize_text(text):
@@ -61,11 +61,10 @@ produks = df_harga['Nama Produk'].dropna().unique().tolist()
 if 'keranjang' not in st.session_state:
     st.session_state.keranjang = []
 
-# --- FILE REKAP CSV (DATABASE LOKAL / GSHEET EQUIVALENT) ---
+# --- FILE REKAP CSV ---
 REKAP_FILE = "Rekap_SPH.csv"
 
 def simpan_ke_rekap(data_rows):
-    """Menyimpan data SPH ke file rekap"""
     new_df = pd.DataFrame(data_rows)
     if os.path.exists(REKAP_FILE):
         try:
@@ -78,7 +77,6 @@ def simpan_ke_rekap(data_rows):
         new_df.to_csv(REKAP_FILE, index=False)
 
 def cek_riwayat_outlet(outlet_name):
-    """Mengecek apakah outlet sudah pernah dibuatkan SPH"""
     if os.path.exists(REKAP_FILE):
         try:
             df_rekap = pd.read_csv(REKAP_FILE)
@@ -94,28 +92,41 @@ def cek_riwayat_outlet(outlet_name):
 st.markdown("### 1. Pilih Outlet / Rumah Sakit")
 selected_outlet = st.selectbox("Outlet:", outlets, label_visibility="collapsed")
 
-# 🔔 FITUR NOTIFIKASI / TANDA JIKA OUTLET PERNAH DIBUATKAN SPH
 jumlah_riwayat, tgl_terakhir = cek_riwayat_outlet(selected_outlet)
 if jumlah_riwayat > 0:
     st.warning(f"⚠️ **Perhatian:** Outlet **{selected_outlet}** sudah pernah dibuatkan SPH sebanyak **{jumlah_riwayat} kali** (Terakhir pada: {tgl_terakhir}).")
 
-st.markdown("### 2. Tambah Produk ke SPH & Input Diskon")
-col1, col2 = st.columns([2, 1])
-with col1:
-    selected_produk = st.selectbox("Pilih Produk Obat:", produks)
-with col2:
-    diskon = st.number_input("Diskon (%)", min_value=0, max_value=100, value=0, step=1)
+st.markdown("### 2. Tambah Produk & Metode Diskon")
+selected_produk = st.selectbox("Pilih Produk Obat:", produks)
+
+# Ambil data produk terpilih untuk acuan perhitungan
+prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
+hna_val = 0.0
+if 'HNA' in prod_data.index: hna_val = safe_float(prod_data['HNA'])
+elif 'Harga Hna' in prod_data.index: hna_val = safe_float(prod_data['Harga Hna'])
+isi_val = safe_float(prod_data.get('Isi', 1))
+if isi_val <= 0: isi_val = 1
+
+# PILIHAN METODE INPUT DISKON
+metode_diskon = st.radio("Pilih Cara Input Diskon:", ["Berdasarkan Persen (%)", "Berdasarkan Target Harga Jadi (Satuan)"])
+
+diskon = 0.0
+if metode_diskon == "Berdasarkan Persen (%)":
+    diskon = float(st.number_input("Masukkan Diskon (%)", min_value=0.0, max_value=100.0, value=0.0, step=0.1))
+else:
+    # Input Berdasarkan Target Harga Jadi Satuan (Inc PPN)
+    target_harga_jadi = st.number_input("Masukkan Target Harga Jadi / Satuan (Inc PPN & Dibagi Isi):", min_value=0.0, value=0.0, step=100.0)
+    if target_harga_jadi > 0:
+        # Rumusbalik: target = ((HNA - (HNA * disc / 100)) * 1.11) / isi
+        # target * isi / 1.11 = HNA - (HNA * disc / 100)
+        # HNA * disc / 100 = HNA - (target * isi / 1.11)
+        # disc = (HNA - (target * isi / 1.11)) / HNA * 100
+        net_target = (target_harga_jadi * isi_val) / 1.11
+        if hna_val > 0:
+            diskon = max(0.0, min(100.0, ((hna_val - net_target) / hna_val) * 100))
+            st.info(f"💡 Diskon otomatis dihitung: **{diskon:.2f}%**")
 
 if st.button("➕ Tambah ke SPH", use_container_width=True):
-    prod_data = df_harga[df_harga['Nama Produk'] == selected_produk].iloc[0]
-    
-    hna_val = 0.0
-    if 'HNA' in prod_data.index: hna_val = safe_float(prod_data['HNA'])
-    elif 'Harga Hna' in prod_data.index: hna_val = safe_float(prod_data['Harga Hna'])
-        
-    isi_val = safe_float(prod_data.get('Isi', 1))
-    if isi_val <= 0: isi_val = 1
-        
     harga_net = hna_val - (hna_val * diskon / 100)
     harga_total_ppn = harga_net * 1.11 
     harga_jadi_satuan = harga_total_ppn / isi_val
@@ -127,10 +138,10 @@ if st.button("➕ Tambah ke SPH", use_container_width=True):
         'Satuan': prod_data.get('Kemasan', '-'),
         'Isi': int(isi_val),
         'HNA': hna_val,
-        'Diskon': diskon,
+        'Diskon': round(diskon, 2),
         'Harga Jadi Satuan': harga_jadi_satuan
     })
-    st.success(f"Berhasil menambahkan {selected_produk} dengan diskon {diskon}%!")
+    st.success(f"Berhasil menambahkan {selected_produk} (Diskon: {diskon:.1f}%)!")
 
 if len(st.session_state.keranjang) > 0:
     st.markdown("### 📋 Daftar Produk di SPH:")
@@ -164,11 +175,9 @@ if len(st.session_state.keranjang) > 0:
         img_qr = qr.make_image(fill_color="black", back_color="white")
         img_qr.save(qr_path)
         
-        # Nomor Dokumen Unik Berdasarkan Waktu
         no_dokumen = f"SPH/{datetime.datetime.now().strftime('%Y%m%d/%H%M%S')}"
         tgl_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         
-        # Siapkan data untuk Rekap GSheet/CSV
         rekap_rows = []
         for item in st.session_state.keranjang:
             rekap_rows.append({
@@ -370,14 +379,13 @@ if len(st.session_state.keranjang) > 0:
             use_container_width=True
         )
 
-# --- MENU LIHAT REKAP (GOOGLE SHEET EQUIVALENT) ---
+# --- MENU LIHAT REKAP ---
 st.markdown("---")
 with st.expander("📊 Lihat Rekap SPH Keseluruhan (Database GSheet)"):
     if os.path.exists(REKAP_FILE):
         df_rekap_view = pd.read_csv(REKAP_FILE)
         st.dataframe(df_rekap_view, use_container_width=True)
         
-        # Tombol download rekap untuk dibuka di Excel / Google Sheets
         st.download_button(
             label="📥 Download File Rekap (.csv)",
             data=df_rekap_view.to_csv(index=False).encode('utf-8'),
