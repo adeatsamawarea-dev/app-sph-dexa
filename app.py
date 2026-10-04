@@ -8,9 +8,9 @@ import os
 from PIL import Image
 import qrcode
 
-st.set_page_config(page_title="SPH Dexa Medica", page_icon="📄", layout="centered")
+st.set_page_config(page_title="SPH - SOLHAYS 2026", page_icon="📄", layout="centered")
 
-st.title("📄 Cetak SPH - Mobile")
+st.title("📄 SPH - SOLHAYS 2026")
 st.subheader("Format Portrait (Final & Rapi)")
 
 # --- FUNGSI PENDUKUNG ---
@@ -405,7 +405,6 @@ with st.expander("📊 Lihat Rekap SPH Keseluruhan (Database GSheet)"):
             use_container_width=True
         )
         
-        # TOMBOL UNTUK MENGOSONGKAN REKAP LANGSUNG DARI HP
         if st.button("🗑️ Hapus / Reset Semua Data Rekap"):
             try:
                 os.remove(REKAP_FILE)
