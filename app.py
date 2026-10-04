@@ -42,7 +42,6 @@ def safe_float(val):
     try: return float(val_str)
     except: return 0.0
 
-# Terjemahan Bulan Indonesia
 BULAN_ID = {
     1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
     7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember'
@@ -219,7 +218,6 @@ if len(st.session_state.keranjang) > 0:
         pdf.cell(0, 5, f'Surakarta, {tgl_indo_str}', 0, 1, 'L')
 
         pdf.ln(4)
-        # Perihal & Nomor di-align dengan titik dua sejajar rapi
         pdf.set_font('Arial', '', 10)
         pdf.cell(17, 5, 'Perihal', 0, 0, 'L')
         pdf.cell(3, 5, ':', 0, 0, 'C')
@@ -392,7 +390,7 @@ if len(st.session_state.keranjang) > 0:
             use_container_width=True
         )
 
-# --- MENU LIHAT REKAP ---
+# --- MENU LIHAT REKAP & TOMBOL HAPUS/RESET ---
 st.markdown("---")
 with st.expander("📊 Lihat Rekap SPH Keseluruhan (Database GSheet)"):
     if os.path.exists(REKAP_FILE):
@@ -406,5 +404,14 @@ with st.expander("📊 Lihat Rekap SPH Keseluruhan (Database GSheet)"):
             mime="text/csv",
             use_container_width=True
         )
+        
+        # TOMBOL UNTUK MENGOSONGKAN REKAP LANGSUNG DARI HP
+        if st.button("🗑️ Hapus / Reset Semua Data Rekap"):
+            try:
+                os.remove(REKAP_FILE)
+                st.success("Data rekap berhasil dikosongkan!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Gagal menghapus file rekap: {e}")
     else:
         st.info("Belum ada data rekap. Buat SPH pertama Anda untuk mulai merekap.")
